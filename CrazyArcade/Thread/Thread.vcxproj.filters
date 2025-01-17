@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Thread1.cpp">
+    <ClCompile Include="SyncMutex.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
