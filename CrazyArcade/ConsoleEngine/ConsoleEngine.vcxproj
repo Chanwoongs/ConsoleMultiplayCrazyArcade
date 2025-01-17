@@ -71,20 +71,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)Intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)ConsoleEngineBin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)ConsoleEngineIntermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)Intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)ConsoleEngineBin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)ConsoleEngineIntermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)Intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)ConsoleEngineBin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)ConsoleEngineIntermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)Intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)ConsoleEngineBin\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)ConsoleEngineIntermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,10 +104,10 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\Includes\ /e /y</Command>
+      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\ConsoleEngineIncludes\ /e /y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\Lib\ /e /y
+      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\ConsoleEngineLib\ /e /y
 xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -133,10 +133,10 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\Includes\ /e /y</Command>
+      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\ConsoleEngineIncludes\ /e /y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\Lib\ /e /y
+      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\ConsoleEngineLib\ /e /y
 xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -158,10 +158,10 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\Includes\ /e /y</Command>
+      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\ConsoleEngineIncludes\ /e /y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\Lib\ /e /y
+      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\ConsoleEngineLib\ /e /y
 xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -187,10 +187,10 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\Includes\ /e /y</Command>
+      <Command>xcopy $(ProjectDir)*.h $(SolutionDir)\ConsoleEngineIncludes\ /e /y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\Lib\ /e /y
+      <Command>xcopy $(OutDir)\ConsoleEngine.dll $(SolutionDir)\ConsoleEngineLib\ /e /y
 xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -207,7 +207,6 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\Lib\ /e /y</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Actor.h" />
