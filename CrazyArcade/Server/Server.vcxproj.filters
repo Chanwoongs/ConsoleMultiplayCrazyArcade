@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CalcServer.cpp">
+    <ClCompile Include="EchoSelectServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
