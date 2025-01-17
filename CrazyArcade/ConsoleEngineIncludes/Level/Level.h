@@ -11,7 +11,7 @@ class ENGINE_API Level : public RTTI
 {
     // RTTI 정의
     RTTI_DECLARATIONS(Level, RTTI)
-
+         
 public:
 	Level();
 	virtual ~Level();

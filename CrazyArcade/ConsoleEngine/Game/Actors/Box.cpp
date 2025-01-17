@@ -1,4 +1,6 @@
-﻿#include "Box.h"
+﻿#include "PrecompiledHeader.h"
+
+#include "Box.h"
 
 Box::Box(const Vector2& position)
     : DrawableActor("b")

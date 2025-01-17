@@ -2,11 +2,11 @@
 
 #include "Engine/Engine.h"
 #include "Engine/Timer.h"
-#include "Actor/Wall.h"
-#include "Actor/Ground.h"
-#include "Actor/Box.h"
-#include "Actor/Target.h"
-#include "Actor/Player.h"
+#include "Game/Actors/Ground.h"
+#include "Game/Actors/Wall.h"
+#include "Game/Actors/Box.h"
+#include "Game/Actors/Target.h"
+#include "Game/Actors/Player.h"
 
 GameLevel::GameLevel()
 {

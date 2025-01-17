@@ -19,7 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="Game\Game.h" />
+    <ClInclude Include="Game\Player.h" />
+    <ClInclude Include="Levels\GameLevel.h" />
+    <ClInclude Include="Levels\MenuLevel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Game\Player.cpp" />
+    <ClCompile Include="Levels\GameLevel.cpp" />
+    <ClCompile Include="Levels\MenuLevel.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
