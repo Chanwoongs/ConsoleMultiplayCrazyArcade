@@ -5,6 +5,8 @@
 
 #pragma comment (lib, "ws2_32.lib")
 
+#define TEST 1
+
 #define BUF_SIZE 1024
 void ErrorHandling(const char* message);
 
@@ -20,11 +22,13 @@ int main(int argc, char* argv[])
     fd_set reads, cpyReads;
     int strLen, fdNum, i;
 
+#if !TEST
     if (argc != 2)
     {
         printf("Usage: %s <port>\n ", argv[0]);
         exit(1);
     }
+#endif
 
     // 소켓 라이브러리 초기화 함수
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -42,7 +46,13 @@ int main(int argc, char* argv[])
     memset(&servAddr, 0, sizeof(servAddr));
     servAddr.sin_family = AF_INET;
     servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+#if TEST
+    servAddr.sin_port = htons(9190);
+#else
     servAddr.sin_port = htons(atoi(argv[1]));
+#endif
+    
 
     // 소켓에 IP 주소와 PORT 번호 할당
     if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
@@ -90,7 +100,7 @@ int main(int argc, char* argv[])
                     hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &clntAddrSize);
                     // 클라이언트와 연결된 파일 디스크립터 정보를 등록
                     FD_SET(hClntSock, &reads);
-                    printf("connected client: %d \n", hClntSock);
+                    printf("connected client: %d \n", (int)hClntSock);
                 }
                 else // Read Message
                 {
@@ -104,7 +114,20 @@ int main(int argc, char* argv[])
                     }
                     else
                     {
-                        send(reads.fd_array[i], buf, strLen, 0); // echo!
+                        buf[strLen] = '\0';
+
+                        char sendMsg[BUF_SIZE];
+                        sprintf_s(sendMsg, BUF_SIZE, "%s", buf);
+
+                        for (int j = 0; j < reads.fd_count; j++)
+                        {
+                            SOCKET targetSock = reads.fd_array[j];
+
+                            if (targetSock != hServSock)
+                            {
+                                send(targetSock, sendMsg, (int)strlen(sendMsg), 0);
+                            }
+                        }
                     }
                 }
             }

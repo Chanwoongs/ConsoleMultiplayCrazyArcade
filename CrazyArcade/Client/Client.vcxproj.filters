@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EchoClient2.cpp">
+    <ClCompile Include="EchoClient.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
