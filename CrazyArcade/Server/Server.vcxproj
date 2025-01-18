@@ -105,7 +105,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\ConsoleEngineLib\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -130,7 +130,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalLibraryDirectories>$(SolutionDir)\ConsoleEngineLib\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -151,7 +151,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalLibraryDirectories>$(SolutionDir)\ConsoleEngineLib\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -176,7 +176,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalLibraryDirectories>$(SolutionDir)\ConsoleEngineLib\</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>

@@ -3,11 +3,14 @@
 #include <Level/Level.h>
 #include <Math/Vector2.h>
 
+#include "EngineGame/Actors/Ground.h"
+#include "EngineGame/Actors/Wall.h"
+#include "EngineGame/Actors/Box.h"
+#include "EngineGame/Actors/Target.h"
+
+#include "ClientGame/Player.h"
+
 // 소코반 게임 레벨
-class DrawableActor;
-class Player;
-class Box;
-class Target;
 class GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)

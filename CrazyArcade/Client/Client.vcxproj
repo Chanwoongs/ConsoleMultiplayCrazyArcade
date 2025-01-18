@@ -19,16 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\Game.h" />
-    <ClInclude Include="Game\Player.h" />
+    <ClInclude Include="ClientGame\Game.h" />
+    <ClInclude Include="ClientGame\Player.h" />
     <ClInclude Include="Levels\GameLevel.h" />
     <ClInclude Include="Levels\MenuLevel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game\Game.cpp" />
-    <ClCompile Include="Game\Player.cpp" />
+    <ClCompile Include="ClientGame\Game.cpp" />
+    <ClCompile Include="ClientGame\Player.cpp" />
     <ClCompile Include="Levels\GameLevel.cpp" />
     <ClCompile Include="Levels\MenuLevel.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -113,7 +114,7 @@
       <AdditionalDependencies>ConsoleEngine.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -137,7 +138,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalDependencies>ConsoleEngine.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -157,7 +158,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalDependencies>ConsoleEngine.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>
@@ -181,7 +182,7 @@ xcopy ..\Assets $(OutDir)..\Assets\ /y /e
       <AdditionalDependencies>ConsoleEngine.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(SolutionDir)\Lib\ConsoleEngine.dll $(OutDir)\ /y
+      <Command>xcopy $(SolutionDir)\ConsoleEngineLib\ConsoleEngine.dll $(OutDir)\ /y
 xcopy ..\Assets $(OutDir)..\Assets\ /y /e
 </Command>
     </PreBuildEvent>

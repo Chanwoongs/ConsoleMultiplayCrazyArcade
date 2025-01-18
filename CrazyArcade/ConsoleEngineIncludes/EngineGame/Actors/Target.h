@@ -2,7 +2,7 @@
 
 #include "Actor/DrawableActor.h"
 
-class Target : public DrawableActor
+class ENGINE_API Target : public DrawableActor
 {
     RTTI_DECLARATIONS(Target, DrawableActor)
 

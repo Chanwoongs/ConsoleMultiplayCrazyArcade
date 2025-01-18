@@ -1,6 +1,6 @@
 ﻿#include "MenuLevel.h"
 #include "Engine/Engine.h"
-#include "Game/Game.h"
+#include "ClientGame/Game.h"
 
 MenuLevel::MenuLevel()
 {

@@ -36,16 +36,16 @@
     <ClCompile Include="Engine\Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Actors\Box.cpp">
+    <ClCompile Include="EngineGame\Actors\Box.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Actors\Ground.cpp">
+    <ClCompile Include="EngineGame\Actors\Ground.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Actors\Target.cpp">
+    <ClCompile Include="EngineGame\Actors\Target.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Actors\Wall.cpp">
+    <ClCompile Include="EngineGame\Actors\Wall.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,16 +80,16 @@
     <ClInclude Include="Engine\Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Actors\Box.h">
+    <ClInclude Include="EngineGame\Actors\Box.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Actors\Ground.h">
+    <ClInclude Include="EngineGame\Actors\Ground.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Actors\Target.h">
+    <ClInclude Include="EngineGame\Actors\Target.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Actors\Wall.h">
+    <ClInclude Include="EngineGame\Actors\Wall.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

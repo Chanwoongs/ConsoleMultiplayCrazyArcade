@@ -2,7 +2,7 @@
 
 #include "Actor/DrawableActor.h"
 
-class Box : public DrawableActor
+class ENGINE_API Box : public DrawableActor
 {
     RTTI_DECLARATIONS(Box, DrawableActor)
 

@@ -2,11 +2,6 @@
 
 #include "Engine/Engine.h"
 #include "Engine/Timer.h"
-#include "Game/Actors/Ground.h"
-#include "Game/Actors/Wall.h"
-#include "Game/Actors/Box.h"
-#include "Game/Actors/Target.h"
-#include "Game/Actors/Player.h"
 
 GameLevel::GameLevel()
 {
@@ -32,7 +27,7 @@ GameLevel::GameLevel()
 
     // 이동한 위치의 FP 가져오기
     size_t readSize = ftell(file);
-
+     
     // FP 원위치
     //fseek(file, 0, SEEK_SET); // set, cur, end
     rewind(file);

@@ -2,7 +2,7 @@
 
 #include "Engine/Engine.h"
 #include "Levels/GameLevel.h"
-#include "Game/Game.h"
+#include "ClientGame/Game.h"
 
 Player::Player(const Vector2& position, GameLevel* level)
     : DrawableActor("P"), refLevel(level)
