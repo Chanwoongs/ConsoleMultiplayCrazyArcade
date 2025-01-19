@@ -16,7 +16,7 @@
 class GameServer
 {
 public:
-	GameServer(char* port);
+	GameServer(const char* port);
 	~GameServer();
 
 	void AcceptClients();
@@ -33,6 +33,7 @@ private:
 	SOCKADDR_IN serverAddress;
 
 	HANDLE hMutex;
+	HANDLE hThread;
 
 	int port;
 	int clientCount;

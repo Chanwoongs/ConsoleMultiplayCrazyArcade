@@ -1,6 +1,12 @@
 #include "GameServer.h"
 
-GameServer::GameServer(char* port)
+struct ClientHandleData 
+{
+    GameServer* server; 
+    SOCKET hClientSocket;
+};
+
+GameServer::GameServer(const char* port)
     : port(atoi(port)), clientCount(0)
 {
     WSADATA wsaData;
@@ -41,6 +47,9 @@ GameServer::~GameServer()
 {
     closesocket(hServerSocket);
     WSACleanup();
+
+    CloseHandle(hThread);
+    CloseHandle(hMutex);
 }
 
 void GameServer::AcceptClients()
@@ -56,8 +65,8 @@ void GameServer::AcceptClients()
         ++clientCount;
         ReleaseMutex(hMutex);
 
-        HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)this, 0, NULL);
-        //CloseHandle(hThread);
+        ClientHandleData* clientHandleData = new ClientHandleData{ this, clientSocket };
+        hThread = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)clientHandleData, 0, NULL);
 
         char clientIP[20] = { 0 };
         if (inet_ntop(AF_INET, &clientAddress.sin_addr, clientIP, sizeof(clientIP)))
@@ -73,12 +82,14 @@ void GameServer::AcceptClients()
 
 unsigned WINAPI GameServer::HandleClient(void* arg)
 {
-    GameServer* server = static_cast<GameServer*>(arg);
-    SOCKET hClientSocket = *((SOCKET*)arg);
+    ClientHandleData* clientHandleData = static_cast<ClientHandleData*>(arg);
+    GameServer* server = clientHandleData->server;
+    SOCKET hClientSocket = clientHandleData->hClientSocket;
+
     int strLen = 0;
     char msg[BUF_SIZE];
 
-    while ((strLen = recv(hClientSocket, msg, sizeof(msg), 0)) != 0)
+    while ((strLen = recv(hClientSocket, msg, sizeof(msg), 0)) > 0)
     {
         server->Broadcast(msg, strLen);
     }
@@ -94,6 +105,8 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
 
     ReleaseMutex(server->hMutex);
     closesocket(hClientSocket);
+
+    delete clientHandleData;
     return 0;
 }
 
