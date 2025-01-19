@@ -87,11 +87,11 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     SOCKET hClientSocket = clientHandleData->hClientSocket;
 
     int strLen = 0;
-    char msg[BUF_SIZE];
+    char message[BUF_SIZE] = {};
 
-    while ((strLen = recv(hClientSocket, msg, sizeof(msg), 0)) > 0)
+    while ((strLen = recv(hClientSocket, message, sizeof(message), 0)) > 0)
     {
-        server->Broadcast(msg, strLen);
+        server->Broadcast(message, strLen);
     }
 
     WaitForSingleObject(server->hMutex, INFINITE);

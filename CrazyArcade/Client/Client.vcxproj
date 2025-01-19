@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="ClientGame\Game.h" />
     <ClInclude Include="ClientGame\Player.h" />
+    <ClInclude Include="GameClient.h" />
     <ClInclude Include="Levels\GameLevel.h" />
     <ClInclude Include="Levels\MenuLevel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClientGame\Game.cpp" />
     <ClCompile Include="ClientGame\Player.cpp" />
+    <ClCompile Include="GameClient.cpp" />
     <ClCompile Include="Levels\GameLevel.cpp" />
     <ClCompile Include="Levels\MenuLevel.cpp" />
     <ClCompile Include="main.cpp" />
