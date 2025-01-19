@@ -225,6 +225,7 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\ConsoleEngineLib\ /e /y</Comman
     <ClInclude Include="Engine\Timer.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Math\Vector2.h" />
+    <ClInclude Include="Network\Packets.h" />
     <ClInclude Include="PrecompiledHeader\PrecompiledHeader.h" />
     <ClInclude Include="RTTI.h" />
   </ItemGroup>
