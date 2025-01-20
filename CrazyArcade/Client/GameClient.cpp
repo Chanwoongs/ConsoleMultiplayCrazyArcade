@@ -96,13 +96,10 @@ unsigned WINAPI GameClient::Send(void* arg)
             SOCKET hSocket = client->Socket();
             PacketType type = packetData->packetType;
             void* packet = packetData->packet;
-
-            if (type == PacketType::INPUT)
-            {
-                char buffer[MAX_BUFFER_SIZE] = {};
-                SerializePacket(packet, sizeof(buffer), buffer);
-                send(hSocket, buffer, strlen(buffer), 0);
-            }
+            
+            char buffer[MAX_BUFFER_SIZE] = {};
+            SerializePacket(packet, sizeof(buffer), buffer);
+            send(hSocket, buffer, sizeof(buffer), 0);
 
             delete packet;
             delete packetData;
@@ -120,21 +117,16 @@ unsigned WINAPI GameClient::Receive(void* arg)
 {
     GameClient* client = static_cast<GameClient*>(arg);
     SOCKET hSocket = client->Socket();
-    char buffer[MAX_BUFFER_SIZE + 1] = {};
+    char buffer[MAX_BUFFER_SIZE] = {};
     int strLen;
 
     while (!client->IsGameover())
     {
         strLen = recv(hSocket, buffer, MAX_BUFFER_SIZE, 0);
-        if (strLen <= 0)
-        {
-            continue;
-        }
 
         if (strLen > 0)
         {
-            buffer[strLen] = 0;
-            fputs(buffer, stdout);
+            client->ProcessPacket(buffer);
         }
     }
     return 0;
@@ -145,6 +137,22 @@ void GameClient::AddPacketToSendQueue(PacketData* data)
     WaitForSingleObject(hSendMutex, INFINITE);
     sendQueue.push(data);
     ReleaseMutex(hSendMutex);
+}
+
+void GameClient::ProcessPacket(char* packet)
+{
+    PacketHeader* packetHeader = (PacketHeader*)packet;
+
+    switch ((PacketType)packetHeader->packetType)
+    {
+    case PacketType::PLAYER_ENTER_RESPOND:
+        PlayerEnterRespondPacket* playerEnterRespondPacket = (PlayerEnterRespondPacket*)packet;
+
+        playerId = playerEnterRespondPacket->playerId;
+
+        printf("부여 받은 PlayerId : %d", playerId);
+        break;
+    }
 }
 
 void GameClient::ErrorHandling(const char* message)

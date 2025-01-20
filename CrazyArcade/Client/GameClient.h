@@ -31,6 +31,7 @@ public:
 	static unsigned WINAPI Receive(void* arg);
 
     void AddPacketToSendQueue(PacketData* data);
+    void ProcessPacket(char* packet);
 
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
@@ -47,6 +48,7 @@ private:
 
     std::queue<PacketData*> sendQueue;
 
+    int playerId;
     bool isGameover;
 };
 

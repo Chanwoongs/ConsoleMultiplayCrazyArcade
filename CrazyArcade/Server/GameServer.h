@@ -17,6 +17,7 @@
 #define BUF_SIZE 256
 
 struct ClientHandleData;
+struct PacketData;
 
 class GameServer
 {
@@ -26,7 +27,9 @@ public:
 
 	void AcceptClients();
 	static unsigned WINAPI HandleClient(void* arg);
-	void Broadcast(char* packet, int len);
+    void ProcessPacket(SOCKET clientSocket, char* packet);
+	void Send(SOCKET clientSocket, void* packet);
+	void Broadcast(char* packet);
 
     inline void Stop() { isRunning = false; }
 
@@ -39,8 +42,9 @@ private:
 	SOCKADDR_IN serverAddress;
 
 	HANDLE hMutex;
-	HANDLE hThread;
+	std::vector<HANDLE> clientThreads;
 
+    int playerCount = 0;
 	int port;
 	int clientCount;
 
@@ -51,4 +55,15 @@ struct ClientHandleData
 {
     GameServer* server;
     SOCKET hClientSocket;
+};
+
+struct PacketData
+{
+    PacketType packetType;
+    char* packet;
+
+    PacketData(const PacketType& packetType, char* packet)
+        : packetType(packetType), packet(packet)
+    {
+    }
 };

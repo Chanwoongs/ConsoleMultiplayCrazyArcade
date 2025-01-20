@@ -25,18 +25,24 @@ int main(int argc, char* argv[])
 
     client->RunThreads();
 
+    bool hasEnteredGame = false;
     while (true)
     {
         engine->ProcessInput();
         if (engine->GetKeyDown(VK_RETURN))
         {
-            InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
-            PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
-            client->AddPacketToSendQueue(packetData);
+            //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
+            //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
+            //client->AddPacketToSendQueue(packetData);
 
-            //PlayerEnterRequestPacket* playerEnterRequestPacket = new PlayerEnterRequestPacket;
-
-
+            if (!hasEnteredGame)
+            {
+                PlayerEnterRequestPacket* playerEnterRequestPacket = new PlayerEnterRequestPacket;
+                PacketData* playerEnterRequestPacketData =
+                    new PacketData(client, PacketType(playerEnterRequestPacket->header.packetType), (void*)playerEnterRequestPacket);
+                client->AddPacketToSendQueue(playerEnterRequestPacketData);
+                hasEnteredGame = true;
+            }
         }
         engine->SavePreviousKeyStates();
     }

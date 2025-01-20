@@ -42,7 +42,10 @@ GameServer::~GameServer()
     closesocket(hServerSocket);
     WSACleanup();
 
-    CloseHandle(hThread);
+    for (auto& thread : clientThreads)
+    {
+        CloseHandle(thread);
+    }
     CloseHandle(hMutex);
 }
 
@@ -55,12 +58,25 @@ void GameServer::AcceptClients()
         SOCKET clientSocket = accept(hServerSocket, (SOCKADDR*)&clientAddress, &clientAddressSize);
 
         WaitForSingleObject(hMutex, INFINITE);
+
+        if (clientSockets.size() >= 8) 
+        {
+            closesocket(clientSocket);
+            printf("Connection refused: Max clients reached.\n");
+            ReleaseMutex(hMutex);
+            continue;
+        }
+
         clientSockets.push_back(clientSocket);
         ++clientCount;
         ReleaseMutex(hMutex);
 
         ClientHandleData* clientHandleData = new ClientHandleData{ this, clientSocket };
-        hThread = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)clientHandleData, 0, NULL);
+        HANDLE threadHandle = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)clientHandleData, 0, NULL);
+
+        WaitForSingleObject(hMutex, INFINITE);
+        clientThreads.push_back(threadHandle); 
+        ReleaseMutex(hMutex);
 
         char clientIP[20] = { 0 };
         if (inet_ntop(AF_INET, &clientAddress.sin_addr, clientIP, sizeof(clientIP)))
@@ -82,15 +98,15 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
 
     int strLen = 0;
     char buffer[MAX_BUFFER_SIZE] = {};
-    char packet[sizeof(InputPacket)] = {};
 
     while ((strLen = recv(hClientSocket, buffer, sizeof(buffer), 0)) > 0)
     {
-        DeserializePacket(packet, sizeof(InputPacket), buffer);
+        char* packet = new char[strLen];
+        DeserializePacket(packet, strlen(packet), buffer);
         
-        InputPacket* inputPacket = (InputPacket*)packet;
+        server->ProcessPacket(hClientSocket, packet);
 
-        server->Broadcast(packet, strLen);
+        //server->Broadcast(packet);
 
         strLen = 0;
     }
@@ -111,7 +127,38 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     return 0;
 }
 
-void GameServer::Broadcast(char* packet, int len)
+void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
+{
+    PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packet);
+
+    switch ((PacketType)packetHeader->packetType)
+    {
+    case PacketType::MOVE:
+        break;
+    case PacketType::PLAYER_ENTER_REQUEST:
+        //@TODO: 랜덤 위치 생성 로직 
+        PlayerEnterRespondPacket* playerEnterRespondPacket =
+            new PlayerEnterRespondPacket(++playerCount, 5, 5);
+        
+        Send(clientSocket, (void*)playerEnterRespondPacket);
+        break;
+    }
+}
+
+void GameServer::Send(SOCKET clientSocket, void* packet)
+{
+    WaitForSingleObject(hMutex, INFINITE);
+
+    char buffer[MAX_BUFFER_SIZE] = {};
+    SerializePacket(packet, sizeof(buffer), buffer);
+
+    send(clientSocket, buffer, sizeof(buffer), 0);
+
+    delete[] packet;
+    ReleaseMutex(hMutex);
+}
+
+void GameServer::Broadcast(char* packet)
 {
     WaitForSingleObject(hMutex, INFINITE);
 
@@ -121,7 +168,10 @@ void GameServer::Broadcast(char* packet, int len)
 
     for (auto& client : clientSockets)
     {
-        send(client, buffer, sendLen, 0);  
+        if ((send(client, buffer, sendLen, 0)) == SOCKET_ERROR)
+        {
+            printf("Failed to send to client: %d\n", WSAGetLastError());
+        }
     }
     ReleaseMutex(hMutex);
 }
