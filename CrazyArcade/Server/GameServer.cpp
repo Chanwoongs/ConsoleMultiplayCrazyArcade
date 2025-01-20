@@ -115,12 +115,13 @@ void GameServer::Broadcast(char* packet, int len)
 {
     WaitForSingleObject(hMutex, INFINITE);
 
-    PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packet);
-    isRunning = false;
+    InputPacket* inputPacket = reinterpret_cast<InputPacket*>(packet);
+    char buffer[MAX_BUFFER_SIZE] = {};
+    int sendLen = sprintf_s(buffer, sizeof(buffer), "playerId"); 
 
     for (auto& client : clientSockets)
     {
-        send(client, packet, len, 0);
+        send(client, buffer, sendLen, 0);  
     }
     ReleaseMutex(hMutex);
 }

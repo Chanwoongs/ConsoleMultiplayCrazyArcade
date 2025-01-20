@@ -5,6 +5,12 @@ GameClient::GameClient(const char* ip, const char* port)
 {
     WSADATA wsaData;
 
+    hSendMutex = CreateMutex(NULL, FALSE, NULL);
+    if (hSendMutex == NULL)
+    {
+        ErrorHandling("Mutex creation error!");
+    }
+
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         ErrorHandling("WSAStartup() error!");
@@ -51,11 +57,17 @@ void GameClient::ConnectServer()
 
 void GameClient::RunThreads()
 {
-    hSendThread = (HANDLE)_beginthreadex(NULL, 0, Send, (void*)&hSocket, 0, NULL);
-    hReceiveThread = (HANDLE)_beginthreadex(NULL, 0, Receive, (void*)&hSocket, 0, NULL);
+    hSendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
+    if (hSendThread == NULL)
+    {
+        ErrorHandling("Send thread creation error!");
+    }
 
-    WaitForSingleObject(hSendThread, INFINITE);
-    WaitForSingleObject(hReceiveThread, INFINITE);
+    hReceiveThread = (HANDLE)_beginthreadex(NULL, 0, Receive, this, 0, NULL);
+    if (hReceiveThread == NULL)
+    {
+        ErrorHandling("Receive thread creation error!");
+    }
 }
 
 void GameClient::RunSendThread(void* arg)
@@ -89,7 +101,7 @@ unsigned WINAPI GameClient::Send(void* arg)
             {
                 char buffer[MAX_BUFFER_SIZE] = {};
                 SerializePacket(packet, sizeof(buffer), buffer);
-                send(hSocket, buffer, MAX_BUFFER_SIZE, 0);
+                send(hSocket, buffer, strlen(buffer), 0);
             }
 
             delete packet;
@@ -105,24 +117,27 @@ unsigned WINAPI GameClient::Send(void* arg)
     return 0;
 }
 
-
 unsigned WINAPI GameClient::Receive(void* arg)
 {
-    SOCKET hSocket = *((SOCKET*)arg);
-    char message[NAME_SIZE + BUF_SIZE] = {};
+    GameClient* client = static_cast<GameClient*>(arg);
+    SOCKET hSocket = client->Socket();
+    char buffer[MAX_BUFFER_SIZE + 1] = {};
     int strLen;
-    while (true)
-    {
-        strLen = recv(hSocket, message, NAME_SIZE + BUF_SIZE - 1, 0);
-        if (strLen == -1)
-        {
-            return -1;
-        }
-        message[strLen] = 0;
-        fputs("message from server: ", stdout);
-        fputs(message, stdout);
-    }
 
+    while (!client->IsGameover())
+    {
+        strLen = recv(hSocket, buffer, MAX_BUFFER_SIZE, 0);
+        if (strLen <= 0)
+        {
+            continue;
+        }
+
+        if (strLen > 0)
+        {
+            buffer[strLen] = 0;
+            fputs(buffer, stdout);
+        }
+    }
     return 0;
 }
 

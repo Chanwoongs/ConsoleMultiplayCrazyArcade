@@ -61,7 +61,8 @@ public:
 	// 싱글톤 객체 접근 함수
 	static Engine& Get();
 
-protected:
+//protected:
+public:
 	void ProcessInput();				// 입력
 	void Update(float deltaTime);		// Tick
 

@@ -127,7 +127,6 @@ unsigned WINAPI HandleClnt(void* arg)
         }
     }
 
-
     clntCnt--;
     ReleaseMutex(hMutex);
     closesocket(hClntSock);

@@ -34,7 +34,7 @@ public:
 
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
-    inline std::queue<PacketData*> SendQueue() { return sendQueue; }
+    inline std::queue<PacketData*>& SendQueue() { return sendQueue; }
 
 	void ErrorHandling(const char* message);
 

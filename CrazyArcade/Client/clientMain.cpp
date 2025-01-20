@@ -23,12 +23,13 @@ int main(int argc, char* argv[])
 #endif
     Engine* engine = new Engine();
 
-    client->RunSendThread(client);
+    client->RunThreads();
 
     bool flag = true;
     while (true)
     {
-        if (flag)
+        engine->ProcessInput();
+        if (engine->GetKeyDown(VK_RETURN))
         {
             InputPacket* inputPacket = new InputPacket(PacketType::INPUT, sizeof(InputPacket), 1, VK_RETURN);
             PacketType* type = new PacketType;
@@ -37,10 +38,7 @@ int main(int argc, char* argv[])
             client->AddPacketToSendQueue(packetData);
             flag = false;
         }
-        else
-        {
-
-        }
+        engine->SavePreviousKeyStates();
     }
 
     delete engine;
