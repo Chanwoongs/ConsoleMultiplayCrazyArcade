@@ -94,10 +94,10 @@ unsigned WINAPI GameClient::Send(void* arg)
         if (packetData)
         {
             SOCKET hSocket = client->Socket();
-            PacketType* type = packetData->packetType;
+            PacketType type = packetData->packetType;
             void* packet = packetData->packet;
 
-            if (*type == PacketType::INPUT)
+            if (type == PacketType::INPUT)
             {
                 char buffer[MAX_BUFFER_SIZE] = {};
                 SerializePacket(packet, sizeof(buffer), buffer);
@@ -105,7 +105,6 @@ unsigned WINAPI GameClient::Send(void* arg)
             }
 
             delete packet;
-            delete type;
             delete packetData;
         }
         else

@@ -25,18 +25,18 @@ int main(int argc, char* argv[])
 
     client->RunThreads();
 
-    bool flag = true;
     while (true)
     {
         engine->ProcessInput();
         if (engine->GetKeyDown(VK_RETURN))
         {
-            InputPacket* inputPacket = new InputPacket(PacketType::INPUT, sizeof(InputPacket), 1, VK_RETURN);
-            PacketType* type = new PacketType;
-            *type = PacketType::INPUT;
-            PacketData* packetData = new PacketData(client, type, (void*)inputPacket);
+            InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
+            PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
             client->AddPacketToSendQueue(packetData);
-            flag = false;
+
+            //PlayerEnterRequestPacket* playerEnterRequestPacket = new PlayerEnterRequestPacket;
+
+
         }
         engine->SavePreviousKeyStates();
     }

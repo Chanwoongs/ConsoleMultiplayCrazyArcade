@@ -53,10 +53,10 @@ private:
 struct PacketData
 {
     GameClient* client;
-    PacketType* packetType;
+    PacketType packetType;
     void* packet;
 
-    PacketData(GameClient* client, PacketType* packetType, void* packet)
+    PacketData(GameClient* client, PacketType packetType, void* packet)
         : client(client), packetType(packetType), packet(packet)
     {
     }
