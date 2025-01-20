@@ -4,6 +4,8 @@
 
 int main(int argc, char* argv[])
 {
+    CheckMemoryLeak();
+
 #if !TEST
     if (argc != 2) 
     {
@@ -15,18 +17,21 @@ int main(int argc, char* argv[])
     try
     {
 #if TEST
-        GameServer server("9190");
+        GameServer* server = new GameServer("9190");
 #else
-        GameServer server(argv[1]);
+        GameServer* server = new GameServer(argv[1]);
 #endif
 
-        server.AcceptClients();
+        server->AcceptClients();
+
+        delete server;
     }
     catch (const std::exception& ex)
     {
         fprintf(stderr, "Error: %s\n", ex.what());
         return -1;
     }
+
 
     return 0;
 }

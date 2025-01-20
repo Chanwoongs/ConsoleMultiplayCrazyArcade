@@ -31,7 +31,7 @@
     <ClCompile Include="GameClient.cpp" />
     <ClCompile Include="Levels\GameLevel.cpp" />
     <ClCompile Include="Levels\MenuLevel.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="clientMain.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

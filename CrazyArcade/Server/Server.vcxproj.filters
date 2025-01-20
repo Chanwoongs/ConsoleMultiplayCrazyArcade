@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="serverMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GameServer.cpp">

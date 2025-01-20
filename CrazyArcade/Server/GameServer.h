@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <stdio.h>
@@ -9,9 +9,14 @@
 #include <WS2tcpip.h>
 #include <vector>
 
+#include "Network/Packets.h"
+
 #pragma comment (lib, "ws2_32.lib")
 
+#define MAX_BUFFER_SIZE 1024
 #define BUF_SIZE 256
+
+struct ClientHandleData;
 
 class GameServer
 {
@@ -21,8 +26,9 @@ public:
 
 	void AcceptClients();
 	static unsigned WINAPI HandleClient(void* arg);
-	void Broadcast(char* msg, int len);
+	void Broadcast(char* packet, int len);
 
+    inline void Stop() { isRunning = false; }
 
 	void ErrorHandling(const char* message) const;
 
@@ -37,4 +43,12 @@ private:
 
 	int port;
 	int clientCount;
+
+    bool isRunning;
+};
+
+struct ClientHandleData
+{
+    GameServer* server;
+    SOCKET hClientSocket;
 };

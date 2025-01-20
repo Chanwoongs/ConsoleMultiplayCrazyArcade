@@ -1,13 +1,7 @@
-#include "GameServer.h"
-
-struct ClientHandleData 
-{
-    GameServer* server; 
-    SOCKET hClientSocket;
-};
+﻿#include "GameServer.h"
 
 GameServer::GameServer(const char* port)
-    : port(atoi(port)), clientCount(0)
+    : port(atoi(port)), clientCount(0), isRunning(true)
 {
     WSADATA wsaData;
 
@@ -54,7 +48,7 @@ GameServer::~GameServer()
 
 void GameServer::AcceptClients()
 {
-    while (true)
+    while (isRunning)
     {
         SOCKADDR_IN clientAddress;
         int clientAddressSize = sizeof(clientAddress);
@@ -87,11 +81,18 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     SOCKET hClientSocket = clientHandleData->hClientSocket;
 
     int strLen = 0;
-    char message[BUF_SIZE] = {};
+    char buffer[MAX_BUFFER_SIZE] = {};
+    char packet[sizeof(InputPacket)] = {};
 
-    while ((strLen = recv(hClientSocket, message, sizeof(message), 0)) > 0)
+    while ((strLen = recv(hClientSocket, buffer, sizeof(buffer), 0)) > 0)
     {
-        server->Broadcast(message, strLen);
+        DeserializePacket(packet, sizeof(InputPacket), buffer);
+        
+        InputPacket* inputPacket = (InputPacket*)packet;
+
+        server->Broadcast(packet, strLen);
+
+        strLen = 0;
     }
 
     WaitForSingleObject(server->hMutex, INFINITE);
@@ -110,12 +111,16 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     return 0;
 }
 
-void GameServer::Broadcast(char* msg, int len)
+void GameServer::Broadcast(char* packet, int len)
 {
     WaitForSingleObject(hMutex, INFINITE);
+
+    PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packet);
+    isRunning = false;
+
     for (auto& client : clientSockets)
     {
-        send(client, msg, len, 0);
+        send(client, packet, len, 0);
     }
     ReleaseMutex(hMutex);
 }

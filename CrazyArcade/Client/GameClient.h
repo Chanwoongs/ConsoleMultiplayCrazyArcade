@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <winsock2.h>
@@ -6,10 +6,15 @@
 #include <process.h>
 #include <WS2tcpip.h>
 
+#include "Network/Packets.h"
+
 #pragma comment (lib, "ws2_32.lib")
 
-#define BUF_SIZE  100
+#define MAX_BUFFER_SIZE 1024
+#define BUF_SIZE 100
 #define NAME_SIZE 20
+
+struct PacketData;
 
 class GameClient
 {
@@ -19,9 +24,13 @@ public:
 
 	void ConnectServer();
 	void RunThreads();
+	void RunSendThread(void* arg);
 
 	static unsigned WINAPI Send(void* arg);
 	static unsigned WINAPI Receive(void* arg);
+
+    inline SOCKET Socket() const { return hSocket; }
+    inline bool IsGameover() const { return isGameover; }
 
 	void ErrorHandling(const char* message);
 
@@ -30,4 +39,18 @@ private:
 	SOCKADDR_IN serverAddress;
 
 	HANDLE hSendThread, hReceiveThread;
+
+    bool isGameover;
+};
+
+struct PacketData
+{
+    GameClient* client;
+    PacketType* packetType;
+    void* packet;
+
+    PacketData(GameClient* client, PacketType* packetType, void* packet)
+        : client(client), packetType(packetType), packet(packet)
+    {
+    }
 };

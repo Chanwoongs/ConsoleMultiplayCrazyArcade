@@ -1,6 +1,7 @@
-#include "GameClient.h"
+﻿#include "GameClient.h"
 
 GameClient::GameClient(const char* ip, const char* port)
+    : isGameover(false)
 {
     WSADATA wsaData;
 
@@ -43,7 +44,7 @@ void GameClient::ConnectServer()
     }
     else
     {
-        puts("Connected........."); 
+        puts("Connected.........");
     }
 }
 
@@ -56,32 +57,43 @@ void GameClient::RunThreads()
     WaitForSingleObject(hReceiveThread, INFINITE);
 }
 
+void GameClient::RunSendThread(void* arg)
+{
+    PacketData* data = (PacketData*)arg;
+    InputPacket* inputPacket = (InputPacket*)data->packet;
+    hSendThread = (HANDLE)_beginthreadex(NULL, 0, Send, arg, 0, NULL);
+
+    WaitForSingleObject(hSendThread, INFINITE);
+}
+
 unsigned __stdcall GameClient::Send(void* arg)
 {
-    SOCKET hSocket = *((SOCKET*)arg);
-    const char* name = "Client: ";
-    char inputBuffer[BUF_SIZE] = {};
-    char sendBuffer[NAME_SIZE + BUF_SIZE] = {};
+    PacketData* packetData = static_cast<PacketData*>(arg);
+    SOCKET hSocket = packetData->client->Socket();
+    PacketType* type = packetData->packetType;
+    void* packet = packetData->packet;
 
-    while (true)
+    if (packetData->client->IsGameover())
     {
-        fgets(inputBuffer, BUF_SIZE, stdin);
-
-        if (!strcmp(inputBuffer, "q\n") || !strcmp(inputBuffer, "Q\n"))
-        {
-            closesocket(hSocket);
-            exit(0);
-        }
-
-        sprintf_s(sendBuffer, sizeof(sendBuffer), "%s %s", name, inputBuffer);
-
-        send(hSocket, sendBuffer, (int)strlen(sendBuffer), 0);
-
-        memset(sendBuffer, 0, sizeof(sendBuffer));
+        closesocket(hSocket);
+        exit(0);
     }
+
+    if (*type == PacketType::INPUT)
+    {
+        char buffer[MAX_BUFFER_SIZE] = {};
+        SerializePacket(packet, sizeof(buffer), buffer);
+        InputPacket* inputPacket = (InputPacket*)buffer;
+        send(hSocket, buffer, MAX_BUFFER_SIZE, 0);
+    }
+
+    delete packet;
+    delete type;
+    delete packetData;
 
     return 0;
 }
+
 unsigned __stdcall GameClient::Receive(void* arg)
 {
     SOCKET hSocket = *((SOCKET*)arg);
