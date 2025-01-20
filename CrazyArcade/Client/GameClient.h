@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <process.h>
 #include <WS2tcpip.h>
+#include <queue>
 
 #include "Network/Packets.h"
 
@@ -29,8 +30,11 @@ public:
 	static unsigned WINAPI Send(void* arg);
 	static unsigned WINAPI Receive(void* arg);
 
+    void AddPacketToSendQueue(PacketData* data);
+
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
+    inline std::queue<PacketData*> SendQueue() { return sendQueue; }
 
 	void ErrorHandling(const char* message);
 
@@ -39,6 +43,9 @@ private:
 	SOCKADDR_IN serverAddress;
 
 	HANDLE hSendThread, hReceiveThread;
+    HANDLE hSendMutex;
+
+    std::queue<PacketData*> sendQueue;
 
     bool isGameover;
 };

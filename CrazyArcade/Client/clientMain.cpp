@@ -23,22 +23,26 @@ int main(int argc, char* argv[])
 #endif
     Engine* engine = new Engine();
 
-    //engine->Run();
+    client->RunSendThread(client);
 
-    //while (!client->IsGameover())
-    //{
-        //if (Engine::Get().GetKeyDown(VK_RETURN))
-        //{
+    bool flag = true;
+    while (true)
+    {
+        if (flag)
+        {
             InputPacket* inputPacket = new InputPacket(PacketType::INPUT, sizeof(InputPacket), 1, VK_RETURN);
             PacketType* type = new PacketType;
             *type = PacketType::INPUT;
-            PacketData* packetData = new PacketData(client , type, (void*)inputPacket);
-            client->RunSendThread(packetData);
-        //}
-    //}
+            PacketData* packetData = new PacketData(client, type, (void*)inputPacket);
+            client->AddPacketToSendQueue(packetData);
+            flag = false;
+        }
+        else
+        {
 
-    std::cin.get();
-    
+        }
+    }
+
     delete engine;
     delete client;
 

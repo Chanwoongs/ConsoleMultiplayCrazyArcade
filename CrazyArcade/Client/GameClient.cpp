@@ -32,6 +32,7 @@ GameClient::~GameClient()
 
     WSACleanup();
 
+    CloseHandle(hSendMutex);
     CloseHandle(hSendThread);
     CloseHandle(hReceiveThread);
 }
@@ -59,42 +60,53 @@ void GameClient::RunThreads()
 
 void GameClient::RunSendThread(void* arg)
 {
-    PacketData* data = (PacketData*)arg;
-    InputPacket* inputPacket = (InputPacket*)data->packet;
     hSendThread = (HANDLE)_beginthreadex(NULL, 0, Send, arg, 0, NULL);
-
-    WaitForSingleObject(hSendThread, INFINITE);
 }
 
-unsigned __stdcall GameClient::Send(void* arg)
+unsigned WINAPI GameClient::Send(void* arg)
 {
-    PacketData* packetData = static_cast<PacketData*>(arg);
-    SOCKET hSocket = packetData->client->Socket();
-    PacketType* type = packetData->packetType;
-    void* packet = packetData->packet;
+    GameClient* client = static_cast<GameClient*>(arg);
 
-    if (packetData->client->IsGameover())
+    while (!client->IsGameover())
     {
-        closesocket(hSocket);
-        exit(0);
-    }
+        PacketData* packetData = nullptr;
 
-    if (*type == PacketType::INPUT)
-    {
-        char buffer[MAX_BUFFER_SIZE] = {};
-        SerializePacket(packet, sizeof(buffer), buffer);
-        InputPacket* inputPacket = (InputPacket*)buffer;
-        send(hSocket, buffer, MAX_BUFFER_SIZE, 0);
-    }
+        WaitForSingleObject(client->hSendMutex, INFINITE);
+        if (!client->sendQueue.empty())
+        {
+            packetData = client->sendQueue.front();
+            client->sendQueue.pop();
+        }
+        ReleaseMutex(client->hSendMutex);
 
-    delete packet;
-    delete type;
-    delete packetData;
+        if (packetData)
+        {
+            SOCKET hSocket = client->Socket();
+            PacketType* type = packetData->packetType;
+            void* packet = packetData->packet;
+
+            if (*type == PacketType::INPUT)
+            {
+                char buffer[MAX_BUFFER_SIZE] = {};
+                SerializePacket(packet, sizeof(buffer), buffer);
+                send(hSocket, buffer, MAX_BUFFER_SIZE, 0);
+            }
+
+            delete packet;
+            delete type;
+            delete packetData;
+        }
+        else
+        {
+            Sleep(10);
+        }
+    }
 
     return 0;
 }
 
-unsigned __stdcall GameClient::Receive(void* arg)
+
+unsigned WINAPI GameClient::Receive(void* arg)
 {
     SOCKET hSocket = *((SOCKET*)arg);
     char message[NAME_SIZE + BUF_SIZE] = {};
@@ -112,6 +124,13 @@ unsigned __stdcall GameClient::Receive(void* arg)
     }
 
     return 0;
+}
+
+void GameClient::AddPacketToSendQueue(PacketData* data)
+{
+    WaitForSingleObject(hSendMutex, INFINITE);
+    sendQueue.push(data);
+    ReleaseMutex(hSendMutex);
 }
 
 void GameClient::ErrorHandling(const char* message)
