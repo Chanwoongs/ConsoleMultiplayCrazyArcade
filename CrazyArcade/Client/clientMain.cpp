@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
                 PlayerEnterRequestPacket* playerEnterRequestPacket = new PlayerEnterRequestPacket;
                 PacketData* playerEnterRequestPacketData =
                     new PacketData(client, PacketType(playerEnterRequestPacket->header.packetType), (void*)playerEnterRequestPacket);
-                client->AddPacketToSendQueue(playerEnterRequestPacketData);
+                client->EnqueueSend(playerEnterRequestPacketData);
                 hasEnteredGame = true;
             }
         }

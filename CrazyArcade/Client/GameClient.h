@@ -30,7 +30,7 @@ public:
 	static unsigned WINAPI Send(void* arg);
 	static unsigned WINAPI Receive(void* arg);
 
-    void AddPacketToSendQueue(PacketData* data);
+    void EnqueueSend(PacketData* data);
     void ProcessPacket(char* packet);
 
     inline SOCKET Socket() const { return hSocket; }

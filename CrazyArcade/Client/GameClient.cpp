@@ -132,7 +132,7 @@ unsigned WINAPI GameClient::Receive(void* arg)
     return 0;
 }
 
-void GameClient::AddPacketToSendQueue(PacketData* data)
+void GameClient::EnqueueSend(PacketData* data)
 {
     WaitForSingleObject(hSendMutex, INFINITE);
     sendQueue.push(data);

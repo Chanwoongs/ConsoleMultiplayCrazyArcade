@@ -35,6 +35,9 @@ GameServer::GameServer(const char* port)
     {
         ErrorHandling("listen() error");
     }
+
+    sendMutex = CreateMutex(NULL, FALSE, NULL); 
+    sendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
 }
 
 GameServer::~GameServer()
@@ -42,11 +45,14 @@ GameServer::~GameServer()
     closesocket(hServerSocket);
     WSACleanup();
 
+    WaitForMultipleObjects(clientThreads.size(), clientThreads.data(), TRUE, INFINITE);
+
     for (auto& thread : clientThreads)
     {
         CloseHandle(thread);
     }
-    CloseHandle(hMutex);
+    CloseHandle(sendThread);
+    CloseHandle(mutex);
 }
 
 void GameServer::AcceptClients()
@@ -57,26 +63,26 @@ void GameServer::AcceptClients()
         int clientAddressSize = sizeof(clientAddress);
         SOCKET clientSocket = accept(hServerSocket, (SOCKADDR*)&clientAddress, &clientAddressSize);
 
-        WaitForSingleObject(hMutex, INFINITE);
+        WaitForSingleObject(mutex, INFINITE);
 
         if (clientSockets.size() >= 8) 
         {
             closesocket(clientSocket);
             printf("Connection refused: Max clients reached.\n");
-            ReleaseMutex(hMutex);
+            ReleaseMutex(mutex);
             continue;
         }
 
         clientSockets.push_back(clientSocket);
         ++clientCount;
-        ReleaseMutex(hMutex);
+        ReleaseMutex(mutex);
 
         ClientHandleData* clientHandleData = new ClientHandleData{ this, clientSocket };
         HANDLE threadHandle = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)clientHandleData, 0, NULL);
 
-        WaitForSingleObject(hMutex, INFINITE);
+        WaitForSingleObject(mutex, INFINITE);
         clientThreads.push_back(threadHandle); 
-        ReleaseMutex(hMutex);
+        ReleaseMutex(mutex);
 
         char clientIP[20] = { 0 };
         if (inet_ntop(AF_INET, &clientAddress.sin_addr, clientIP, sizeof(clientIP)))
@@ -106,12 +112,10 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
         
         server->ProcessPacket(hClientSocket, packet);
 
-        //server->Broadcast(packet);
-
         strLen = 0;
     }
 
-    WaitForSingleObject(server->hMutex, INFINITE);
+    WaitForSingleObject(server->mutex, INFINITE);
     auto it = std::find(server->clientSockets.begin(), server->clientSockets.end(), 
         hClientSocket);
     if (it != server->clientSockets.end())
@@ -120,10 +124,55 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
         --server->clientCount;
     }
 
-    ReleaseMutex(server->hMutex);
+    ReleaseMutex(server->mutex);
     closesocket(hClientSocket);
 
     delete clientHandleData;
+    return 0;
+}
+
+unsigned WINAPI GameServer::Send(void* arg)
+{
+    GameServer* server = static_cast<GameServer*>(arg);
+
+    while (server->isRunning) 
+    {
+        WaitForSingleObject(server->sendMutex, INFINITE);
+
+        if (!server->sendQueue.empty()) 
+        {
+            SendTask* task = server->sendQueue.front();
+            server->sendQueue.pop();
+
+            ReleaseMutex(server->sendMutex);
+
+            if (task->type == SendTaskType::SEND)
+            {
+                server->Send(task->clientSocket, task->packet);
+            }
+            else if (task->type == SendTaskType::BROADCAST)
+            {
+                server->Broadcast(task->packet);
+                WaitForSingleObject(server->mutex, INFINITE);
+
+                char buffer[MAX_BUFFER_SIZE] = {};
+                SerializePacket(task->packet, sizeof(buffer), buffer);
+
+                for (SOCKET client : server->clientSockets)
+                {
+                    send(client, buffer, sizeof(buffer), 0);
+                }
+
+                ReleaseMutex(server->mutex);
+            }
+            delete task->packet;
+            delete task;
+        }
+        else 
+        {
+            ReleaseMutex(server->sendMutex);
+        }
+    }
     return 0;
 }
 
@@ -140,40 +189,56 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         PlayerEnterRespondPacket* playerEnterRespondPacket =
             new PlayerEnterRespondPacket(++playerCount, 5, 5);
         
-        Send(clientSocket, (void*)playerEnterRespondPacket);
+        EnqueueSend(clientSocket, (void*)playerEnterRespondPacket);
         break;
     }
 }
 
 void GameServer::Send(SOCKET clientSocket, void* packet)
 {
-    WaitForSingleObject(hMutex, INFINITE);
+    WaitForSingleObject(mutex, INFINITE);
 
     char buffer[MAX_BUFFER_SIZE] = {};
     SerializePacket(packet, sizeof(buffer), buffer);
 
     send(clientSocket, buffer, sizeof(buffer), 0);
 
-    delete[] packet;
-    ReleaseMutex(hMutex);
+    ReleaseMutex(mutex);
 }
 
-void GameServer::Broadcast(char* packet)
+void GameServer::Broadcast(void* packet)
 {
-    WaitForSingleObject(hMutex, INFINITE);
+    WaitForSingleObject(mutex, INFINITE);
 
-    InputPacket* inputPacket = reinterpret_cast<InputPacket*>(packet);
     char buffer[MAX_BUFFER_SIZE] = {};
-    int sendLen = sprintf_s(buffer, sizeof(buffer), "playerId"); 
+    SerializePacket(packet, sizeof(buffer), buffer);
 
-    for (auto& client : clientSockets)
+    for (SOCKET client : clientSockets)
     {
-        if ((send(client, buffer, sendLen, 0)) == SOCKET_ERROR)
-        {
-            printf("Failed to send to client: %d\n", WSAGetLastError());
-        }
+        send(client, buffer, sizeof(buffer), 0);
     }
-    ReleaseMutex(hMutex);
+
+    ReleaseMutex(mutex);
+}
+
+void GameServer::EnqueueSend(SOCKET clientSocket, void* packet)
+{
+    WaitForSingleObject(sendMutex, INFINITE);
+
+    SendTask* task = new SendTask{ SendTaskType::SEND, clientSocket, packet };
+    sendQueue.push(task);
+
+    ReleaseMutex(sendMutex);
+}
+
+void GameServer::EnqueueBroadcast(SOCKET clientSocket, void* packet)
+{
+    WaitForSingleObject(sendMutex, INFINITE);
+
+    SendTask* task = new SendTask{ SendTaskType::BROADCAST, clientSocket, packet };
+    sendQueue.push(task);
+
+    ReleaseMutex(sendMutex);
 }
 
 void GameServer::ErrorHandling(const char* message) const
