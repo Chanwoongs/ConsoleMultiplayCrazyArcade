@@ -1,9 +1,6 @@
 ﻿#pragma once
 
 #include "Engine/Engine.h"
-//#include "GameClient.h"
-//#include "Network/Packets.h"
-//#include "Levels/MenuLevel.h"
 
 class Game : public Engine
 {

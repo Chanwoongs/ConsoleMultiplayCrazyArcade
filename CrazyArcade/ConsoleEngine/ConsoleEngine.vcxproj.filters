@@ -45,6 +45,12 @@
     <ClCompile Include="Network\Packets.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="EngineGame\Levels\GameLevel.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineGame\Actors\Player.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">
@@ -84,6 +90,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Network\Packets.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineGame\Levels\GameLevel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineGame\Actors\Player.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

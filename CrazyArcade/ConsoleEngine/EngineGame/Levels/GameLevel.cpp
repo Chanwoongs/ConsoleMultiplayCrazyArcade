@@ -1,14 +1,15 @@
-﻿#include "GameLevel.h"
+﻿#include "PrecompiledHeader.h"
+
+#include "GameLevel.h"
 
 #include "Engine/Engine.h"
 #include "Engine/Timer.h"
-#include "ClientGame/Game.h"
 
 GameLevel::GameLevel()
 {
     system("cls");
     // 커서 감추기
-    Game::Get().SetCursorType(CursorType::NoCursor);
+    Engine::Get().SetCursorType(CursorType::NoCursor);
 
     LoadMap();
 }
@@ -29,7 +30,7 @@ void GameLevel::Update(float deltaTime)
         }
 
         // 커서 이동
-        Game::Get().SetCursorPosition(0, Game::Get().ScreenSize().y);
+        Engine::Get().SetCursorPosition(0, Engine::Get().ScreenSize().y);
 
         // 메세지 출력
         Log("Game Clear!");
@@ -38,7 +39,7 @@ void GameLevel::Update(float deltaTime)
         Sleep(2000);
 
         // 게임 종료 처리
-        Game::Get().QuitGame();
+        Engine::Get().QuitGame();
     }
 }
 

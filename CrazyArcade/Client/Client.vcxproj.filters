@@ -18,13 +18,7 @@
     <ClInclude Include="Levels\MenuLevel.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Levels\GameLevel.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ClientGame\Game.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ClientGame\Player.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="GameClient.h">
@@ -35,16 +29,10 @@
     <ClCompile Include="Levels\MenuLevel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Levels\GameLevel.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="clientMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ClientGame\Game.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientGame\Player.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GameClient.cpp">

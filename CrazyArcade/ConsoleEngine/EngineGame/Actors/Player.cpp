@@ -1,8 +1,9 @@
-﻿#include "Player.h"
+﻿#include "PrecompiledHeader.h"
+
+#include "Player.h"
 
 #include "Engine/Engine.h"
-#include "Levels/GameLevel.h"
-#include "ClientGame/Game.h"
+#include "EngineGame/Levels/GameLevel.h"
 
 Player::Player(const Vector2& position, GameLevel* level)
     : DrawableActor("P"), refLevel(level)
@@ -18,7 +19,7 @@ void Player::Update(float deltaTime)
 
     if (Engine::Get().GetKeyDown(VK_ESCAPE))
     {
-        Game::Get().ToggleMenu();
+
     }
 
     // 상하좌우

@@ -1,8 +1,8 @@
 ﻿#include "Game.h"
 
 #include "GameClient.h"
-#include "Levels/GameLevel.h"
 #include "Levels/MenuLevel.h"
+#include "EngineGame/Levels/GameLevel.h"
 
 Game* Game::instance = nullptr;
 

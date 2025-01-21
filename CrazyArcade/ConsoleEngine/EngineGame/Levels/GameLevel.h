@@ -5,8 +5,7 @@
 
 #include "EngineGame/Actors/Ground.h"
 #include "EngineGame/Actors/Wall.h"
-
-#include "ClientGame/Player.h"
+#include "EngineGame/Actors/Player.h"
 
 // 소코반 게임 레벨
 class GameLevel : public Level
