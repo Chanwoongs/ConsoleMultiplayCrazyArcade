@@ -20,9 +20,8 @@ public:
     DrawableActor(const char* image = "");
     virtual ~DrawableActor();
 
-    void Serialize(char* buffer);
-    void Deserialize(const char* buffer);
-    size_t SerializedSize() const;
+    virtual void Serialize(char* buffer, size_t& size);
+    virtual void Deserialize(const char* buffer, size_t& size);
 
     virtual void Draw() override;
     virtual void SetPosition(const Vector2& newPosition) override;

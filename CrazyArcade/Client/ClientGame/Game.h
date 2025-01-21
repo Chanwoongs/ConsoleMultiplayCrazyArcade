@@ -12,6 +12,8 @@ public:
     void RequestEnterGame();
     void EnterGame();
 
+    inline Level* GetCurrentLevel() { return mainLevel; }
+
 	static Game& Get() { return *instance; }
 
 private:

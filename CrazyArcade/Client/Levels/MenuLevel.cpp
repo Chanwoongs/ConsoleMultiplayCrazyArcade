@@ -4,15 +4,15 @@
 
 MenuLevel::MenuLevel()
 {
-	menuItems.PushBack(new MenuItem("Start Game", []() 
+	menuItems.push_back(new MenuItem("Start Game", []() 
         { 
             Game::Get().RequestEnterGame();
         }));
-	menuItems.PushBack(new MenuItem("Quit Game", []() 
+	menuItems.push_back(new MenuItem("Quit Game", []()
         { 
             Game::Get().QuitGame(); 
         }));
-	length = menuItems.Size();
+	length = (int)menuItems.size();
 }
 
 MenuLevel::~MenuLevel()

@@ -61,7 +61,7 @@ public:
     void EnqueueBroadcast(SOCKET clientSocket, void* packet);
 
     inline class GameLevel* GetGameLevel() { return gameLevel; }
-    inline bool IsRunning() { return isRunning; }
+    inline bool IsRunning() const { return isRunning; }
     inline void Stop() { isRunning = false; }
 
 	void ErrorHandling(const char* message) const;
@@ -87,5 +87,6 @@ private:
 
     class GameLevel* gameLevel = nullptr;
 
-    static constexpr int maxBufferSize = 1024;
+    static constexpr int packetBufferSize = 1024;
+    static constexpr int gameStateBufferSize = 2048;
 };

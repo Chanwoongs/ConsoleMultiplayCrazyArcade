@@ -18,7 +18,7 @@ DrawableActor::~DrawableActor()
     delete[] image;
 }
 
-void DrawableActor::Serialize(char* buffer)
+void DrawableActor::Serialize(char* buffer, size_t& size)
 {
     size_t offset = 0;
 
@@ -33,9 +33,12 @@ void DrawableActor::Serialize(char* buffer)
     offset += sizeof(uint32_t);
 
     memcpy(buffer + offset, image, imageLength);
+    offset += imageLength;
+
+    size = offset;
 }
 
-void DrawableActor::Deserialize(const char* buffer)
+void DrawableActor::Deserialize(const char* buffer, size_t& size)
 {
     size_t offset = 0;
 
@@ -52,12 +55,10 @@ void DrawableActor::Deserialize(const char* buffer)
     delete[] image; 
     image = new char[imageLength];
     memcpy(image, buffer + offset, imageLength);
-}
+    offset += imageLength;
 
-size_t DrawableActor::SerializedSize() const 
-{
-    return sizeof(width) + sizeof(color) + strlen(image) + 1;
-}
+    size = offset;
+ }
 
 void DrawableActor::Draw()
 {

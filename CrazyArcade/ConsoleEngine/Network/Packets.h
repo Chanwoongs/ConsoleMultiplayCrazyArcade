@@ -40,22 +40,23 @@ public:
     uint32_t playerId;
     uint32_t posY;
     uint32_t posX;
-    void* gameStateBuffer;
+    uint32_t gameStateSize;
+    char* gameStateBuffer;
 
 public:
     PlayerEnterRespondPacket(const uint32_t& playerId,
         const uint32_t& posY, const uint32_t& posX,
-        const char* gameStateData)
-        : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr)
+        const char* gameStateData, size_t gameStateSize)
+        : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr), gameStateSize(gameStateSize)
     {
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_RESPOND;
         header.packetSize = sizeof(PlayerEnterRespondPacket);
 
-        size_t gameStateSize = strlen(gameStateData) + 1;
-        gameStateBuffer = new char[gameStateSize];  
-        memcpy(gameStateBuffer, gameStateData, gameStateSize);  
+        gameStateBuffer = new char[gameStateSize + 1];  
+        gameStateBuffer[gameStateSize] = '\0';
+        memcpy(gameStateBuffer, gameStateData, gameStateSize);
 
-        header.packetSize += gameStateSize;  
+        header.packetSize += gameStateSize;
     }
 
     ~PlayerEnterRespondPacket()

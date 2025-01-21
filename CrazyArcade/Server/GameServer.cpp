@@ -1,4 +1,5 @@
 ﻿#include "GameServer.h"
+
 #include "EngineGame/Levels/GameLevel.h"
 
 GameServer::GameServer(const char* port)
@@ -118,7 +119,7 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     SOCKET hClientSocket = clientHandleData->hClientSocket;
 
     int strLen = 0;
-    char buffer[maxBufferSize] = {};
+    char buffer[packetBufferSize] = {};
 
     while ((strLen = recv(hClientSocket, buffer, sizeof(buffer), 0)) > 0)
     {
@@ -170,7 +171,7 @@ unsigned WINAPI GameServer::Send(void* arg)
                 server->Broadcast(task->packet);
                 WaitForSingleObject(server->mutex, INFINITE);
 
-                char buffer[maxBufferSize] = {};
+                char buffer[packetBufferSize] = {};
                 SerializePacket(task->packet, sizeof(buffer), buffer);
 
                 for (SOCKET client : server->clientSockets)
@@ -201,24 +202,26 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         break;
     case PacketType::PLAYER_ENTER_REQUEST:
         //@TODO: 랜덤 위치 생성 로직 
-        char buffer[maxBufferSize] = {};
-        size_t gameStateSize;
-        gameLevel->SerializeGameState(buffer, sizeof(buffer), gameStateSize);
+        char buffer[gameStateBufferSize] = {};
+        size_t gameStateSize = 0;
+        gameLevel->SerializeGameState(buffer, gameStateBufferSize, gameStateSize);
 
         PlayerEnterRespondPacket* playerEnterRespondPacket =
             new PlayerEnterRespondPacket(++playerCount, 5, 5, buffer, gameStateSize);
-        
+
+        // EnqueueSend 호출
         EnqueueSend(clientSocket, (void*)playerEnterRespondPacket);
 
         break;
     }
 }
 
+
 void GameServer::Send(SOCKET clientSocket, void* packet)
 {
     WaitForSingleObject(mutex, INFINITE);
 
-    char buffer[maxBufferSize] = {};
+    char buffer[packetBufferSize] = {};
     SerializePacket(packet, sizeof(buffer), buffer);
 
     send(clientSocket, buffer, sizeof(buffer), 0);
@@ -230,7 +233,7 @@ void GameServer::Broadcast(void* packet)
 {
     WaitForSingleObject(mutex, INFINITE);
 
-    char buffer[maxBufferSize] = {};
+    char buffer[packetBufferSize] = {};
     SerializePacket(packet, sizeof(buffer), buffer);
 
     for (SOCKET client : clientSockets)

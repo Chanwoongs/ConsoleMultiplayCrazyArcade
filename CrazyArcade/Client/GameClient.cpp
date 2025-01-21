@@ -163,11 +163,19 @@ void GameClient::ProcessPacket(char* packet)
     switch ((PacketType)packetHeader->packetType)
     {
     case PacketType::PLAYER_ENTER_RESPOND:
-        PlayerEnterRespondPacket* playerEnterRespondPacket = (PlayerEnterRespondPacket*)packet;
 
+        PlayerEnterRespondPacket* playerEnterRespondPacket = (PlayerEnterRespondPacket*)packet;
+        playerEnterRespondPacket->gameStateBuffer = new char[playerEnterRespondPacket->gameStateSize];
+        memcpy(playerEnterRespondPacket->gameStateBuffer, packet + sizeof(PacketHeader) + sizeof(uint32_t) * 4, playerEnterRespondPacket->gameStateSize);
         playerId = playerEnterRespondPacket->playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
+
+        Game::Get().LoadLevel(new GameLevel);
+
+        GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
+        char* c = (char*)playerEnterRespondPacket->gameStateBuffer;
+        currentLevel->DeserializeGameState(c);
 
         Game::Get().EnterGame();
         break;

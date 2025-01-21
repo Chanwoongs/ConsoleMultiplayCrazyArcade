@@ -12,9 +12,20 @@
 
 GameLevel::GameLevel()
 {
-    system("cls");
+    //system("cls");
     // 커서 감추기
+
     Engine::Get().SetCursorType(CursorType::NoCursor);
+
+    map = new DrawableActor();
+}
+
+GameLevel::~GameLevel()
+{
+    for (auto& pos : wallPositions)
+    {
+        delete pos;
+    }
 }
 
 void GameLevel::Update(float deltaTime)
@@ -48,10 +59,10 @@ void GameLevel::Update(float deltaTime)
 
 void GameLevel::Draw()
 {
-    // 맵 그리기
-    for (auto& actor : map)
+    // 맵 그리기    
+    if (map)
     {
-        actor->Draw();  
+        map->Draw();
     }
     
     // 플레이어 그리기
@@ -73,25 +84,12 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
     DrawableActor* searchedActor = nullptr;
 
     // 먼저 이동하려는 위치의 액터 찾기
-    for (auto& actor : map)
+    for (auto& pos : wallPositions)
     {
-        if (actor->Position() == position)
+        if (*pos == position)
         {
-            searchedActor = actor;
             break;
         }
-    }
-
-    // 검색한 액터가 벽인지 확인
-    if (searchedActor->As<Wall>())
-    {
-        return false;
-    }
-
-    // 검색한 액터가 이동 가능한 액터 (땅/타겟)인지 확인
-    if (searchedActor->As<Ground>())
-    {
-        return true;
     }
 
     return false;
@@ -140,6 +138,7 @@ void GameLevel::LoadMap()
     }
 
     buffer[readSize] = '\0';
+    map = new DrawableActor(buffer);
 
     // 파일 읽을 때 사용할 인덱스
     int index = 0;
@@ -151,7 +150,8 @@ void GameLevel::LoadMap()
     // 해석 (파싱-Parcing)
     while (index < (int)bytesRead)
     {
-        char mapChar = buffer[index++];
+        char mapChar = buffer[index];
+        index++;
 
         if (mapChar == '\n')
         {
@@ -159,17 +159,10 @@ void GameLevel::LoadMap()
             xPosition = 0;
             continue;
         }
+
         if (mapChar == '1')
         {
-            Wall* wall = new Wall(Vector2(xPosition, yPosition));
-            actors.push_back(wall);
-            map.push_back(wall);
-        }
-        else if (mapChar == ' ')
-        {
-            Ground* ground = new Ground(Vector2(xPosition, yPosition));
-            actors.push_back(ground);
-            map.push_back(ground);
+            wallPositions.push_back(new Vector2(yPosition, xPosition));
         }
         ++xPosition;
     }
@@ -179,54 +172,22 @@ void GameLevel::LoadMap()
     fclose(file);
 }
 
-void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& size)
+void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outSize)
 {
     size_t offset = 0;
 
-    uint32_t mapCount = static_cast<uint32_t>(map.size());
+    size_t mapSize = 0;
+    map->Serialize(buffer + offset, mapSize);
+    offset += mapSize;
 
-    if (offset + sizeof(mapCount) > bufferSize) 
-    {
-        throw std::overflow_error("Buffer too small to serialize map count");
-    }
-    memcpy(buffer + offset, &mapCount, sizeof(mapCount));
-    offset += sizeof(mapCount);
-
-    for (const auto& actor : map)
-    {
-        size_t actorSize = actor->SerializedSize();
-        if (offset + actorSize > bufferSize) 
-        {
-            throw std::overflow_error("Buffer too small to serialize map data");
-        }
-
-        actor->Serialize(buffer + offset);
-        offset += actorSize;
-    }
-
-    size = offset;
+    outSize = offset;
 }
 
-void GameLevel::DeserializeGameState(const char* buffer, size_t size) 
+void GameLevel::DeserializeGameState(const char* buffer)
 {
-    for (auto& actor : map) 
-    {
-        delete actor; 
-    }
-    map.clear();
-
     size_t offset = 0;
 
-    uint32_t mapCount;
-    memcpy(&mapCount, buffer + offset, sizeof(mapCount));
-    offset += sizeof(mapCount);
-
-    for (uint32_t i = 0; i < mapCount; ++i) 
-    {
-        DrawableActor* actor = new DrawableActor();
-        actor->Deserialize(buffer + offset);
-        offset += actor->SerializedSize();
-
-        map.push_back(actor);
-    }
+    size_t mapSize = 0;
+    map->Deserialize(buffer + offset, mapSize);
+    offset += mapSize;
 }
