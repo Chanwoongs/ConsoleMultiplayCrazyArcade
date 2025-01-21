@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include <Level/Level.h>
-#include <Math/Vector2.h>
+#include <vector>
 
+#include "Level/Level.h"
+#include "Math/Vector2.h"
 #include "EngineGame/Actors/Ground.h"
 #include "EngineGame/Actors/Wall.h"
 #include "EngineGame/Actors/Player.h"
@@ -27,9 +28,9 @@ private:
 
 private:
 
-    List<DrawableActor*> map;
+    std::vector<DrawableActor*> map;
 
-    Player* player = nullptr;
+    std::vector<Player> players;
 
     bool isGameClear = false;
 };

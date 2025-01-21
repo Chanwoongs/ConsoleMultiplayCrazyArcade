@@ -157,13 +157,13 @@ void GameLevel::LoadMap()
         {
             Wall* wall = new Wall(Vector2(xPosition, yPosition));
             actors.PushBack(wall);
-            map.PushBack(wall);
+            map.push_back(wall);
         }
         else if (mapChar == ' ')
         {
             Ground* ground = new Ground(Vector2(xPosition, yPosition));
             actors.PushBack(ground);
-            map.PushBack(ground);
+            map.push_back(ground);
         }
         ++xPosition;
     }
