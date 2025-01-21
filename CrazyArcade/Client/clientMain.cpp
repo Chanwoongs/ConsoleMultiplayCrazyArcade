@@ -3,6 +3,8 @@
 #include "GameClient.h"
 
 #include "Engine/Engine.h"
+#include "ClientGame/Game.h"
+#include "Levels/GameLevel.h"
 #include "Network/Packets.h"
 
 #define TEST 1
@@ -21,15 +23,15 @@ int main(int argc, char* argv[])
 #else
     GameClient* client = new GameClient("127.0.0.1", "9190");
 #endif
-    Engine* engine = new Engine();
+    Game* game = new Game();
 
     client->RunThreads();
 
     bool hasEnteredGame = false;
     while (true)
     {
-        engine->ProcessInput();
-        if (engine->GetKeyDown(VK_RETURN))
+        game->ProcessInput();
+        if (game->GetKeyDown(VK_RETURN))
         {
             //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
             //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
@@ -42,12 +44,15 @@ int main(int argc, char* argv[])
                     new PacketData(client, PacketType(playerEnterRequestPacket->header.packetType), (void*)playerEnterRequestPacket);
                 client->EnqueueSend(playerEnterRequestPacketData);
                 hasEnteredGame = true;
+
+                game->LoadLevel(new GameLevel);
+                game->Run();
             }
         }
-        engine->SavePreviousKeyStates();
+        game->SavePreviousKeyStates();
     }
 
-    delete engine;
+    delete game;
     delete client;
 
     return 0;
