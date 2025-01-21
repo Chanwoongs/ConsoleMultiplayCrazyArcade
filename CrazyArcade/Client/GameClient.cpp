@@ -1,8 +1,15 @@
 ﻿#include "GameClient.h"
 
+#include "ClientGame/Game.h"
+
+GameClient* GameClient::Instance = nullptr;
+
 GameClient::GameClient(const char* ip, const char* port)
-    : isGameover(false)
 {
+    serverAddress = new SOCKADDR_IN();
+
+    Instance = this;
+
     WSADATA wsaData;
 
     hSendMutex = CreateMutex(NULL, FALSE, NULL);
@@ -22,10 +29,10 @@ GameClient::GameClient(const char* ip, const char* port)
         ErrorHandling("socket() error");
     }
 
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    inet_pton(AF_INET, ip, &serverAddress.sin_addr.s_addr);
-    serverAddress.sin_port = htons(atoi(port));
+    memset(serverAddress, 0, sizeof(SOCKADDR_IN));
+    serverAddress->sin_family = AF_INET;
+    inet_pton(AF_INET, ip, &(serverAddress->sin_addr.s_addr));
+    serverAddress->sin_port = htons(atoi(port));
 
     ConnectServer();
 
@@ -41,11 +48,21 @@ GameClient::~GameClient()
     CloseHandle(hSendMutex);
     CloseHandle(hSendThread);
     CloseHandle(hReceiveThread);
+
+    if (serverAddress)
+    {
+        delete serverAddress;
+    }
+}
+
+GameClient::PacketData* GameClient::CreatePacketData(PacketType packetType, void* packet)
+{
+    return new GameClient::PacketData(this, packetType, packet);
 }
 
 void GameClient::ConnectServer()
 {
-    if (connect(hSocket, (SOCKADDR*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+    if (connect(hSocket, (SOCKADDR*)serverAddress, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
     {
         ErrorHandling("connect() error");
     }
@@ -97,7 +114,7 @@ unsigned WINAPI GameClient::Send(void* arg)
             PacketType type = packetData->packetType;
             void* packet = packetData->packet;
             
-            char buffer[MAX_BUFFER_SIZE] = {};
+            char buffer[maxBufferSize] = {};
             SerializePacket(packet, sizeof(buffer), buffer);
             send(hSocket, buffer, sizeof(buffer), 0);
 
@@ -117,12 +134,12 @@ unsigned WINAPI GameClient::Receive(void* arg)
 {
     GameClient* client = static_cast<GameClient*>(arg);
     SOCKET hSocket = client->Socket();
-    char buffer[MAX_BUFFER_SIZE] = {};
+    char buffer[maxBufferSize] = {};
     int strLen;
 
     while (!client->IsGameover())
     {
-        strLen = recv(hSocket, buffer, MAX_BUFFER_SIZE, 0);
+        strLen = recv(hSocket, buffer, maxBufferSize, 0);
 
         if (strLen > 0)
         {
@@ -151,6 +168,8 @@ void GameClient::ProcessPacket(char* packet)
         playerId = playerEnterRespondPacket->playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
+
+        Game::Get().EnterGame();
         break;
     }
 }

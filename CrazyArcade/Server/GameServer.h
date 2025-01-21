@@ -12,25 +12,47 @@
 
 #include "Network/Packets.h"
 
-#pragma comment (lib, "ws2_32.lib")
-
-#define MAX_BUFFER_SIZE 1024
-#define BUF_SIZE 256
-
-struct ClientHandleData;
-struct PacketData;
-struct SendTask;
-enum class SendTaskType;
-
 class GameServer
 {
+    struct ClientHandleData
+    {
+        GameServer* server;
+        SOCKET hClientSocket;
+    };
+
+    struct PacketData
+    {
+        PacketType packetType;
+        void* packet;
+
+        PacketData(const PacketType& packetType, void* packet)
+            : packetType(packetType), packet(packet)
+        {
+        }
+    };
+
+    struct SendTask
+    {
+        enum class Type
+        {
+            SEND = 1,
+            BROADCAST
+        };
+
+        Type type;
+        SOCKET clientSocket;
+        void* packet;
+    };
+
 public:
 	GameServer(const char* port);
 	~GameServer();
 
 	void AcceptClients();
+
 	static unsigned WINAPI HandleClient(void* arg);
     static unsigned WINAPI Send(void* arg);
+
     void ProcessPacket(SOCKET clientSocket, char* packet);
 	void Send(SOCKET clientSocket, void* packet);
 	void Broadcast(void* packet);
@@ -43,51 +65,23 @@ public:
 	void ErrorHandling(const char* message) const;
 
 private:
-	SOCKET hServerSocket;
+	SOCKET hServerSocket = 0;
 	std::vector<SOCKET> clientSockets;
 
-	SOCKADDR_IN serverAddress;
+	SOCKADDR_IN* serverAddress;
 
-	HANDLE mutex;
-    HANDLE sendMutex;
+    HANDLE mutex = nullptr;
+    HANDLE sendMutex = nullptr;
 	std::vector<HANDLE> clientThreads;
-    HANDLE sendThread;
+    HANDLE sendThread = nullptr;
 
     std::queue<SendTask*> sendQueue;
 
     int playerCount = 0;
-	int port;
-	int clientCount;
+	int port = 0;
+	int clientCount = 0;
 
-    bool isRunning;
-};
+    bool isRunning = false;
 
-struct ClientHandleData
-{
-    GameServer* server;
-    SOCKET hClientSocket;
-};
-
-struct PacketData
-{
-    PacketType packetType;
-    char* packet;
-
-    PacketData(const PacketType& packetType, char* packet)
-        : packetType(packetType), packet(packet)
-    {
-    }
-};
-
-struct SendTask
-{
-    SendTaskType type;
-    SOCKET clientSocket;
-    void* packet;
-};
-
-enum class SendTaskType
-{
-    SEND = 1,
-    BROADCAST
+    static constexpr int maxBufferSize = 1024;
 };

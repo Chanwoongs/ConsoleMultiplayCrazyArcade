@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿#pragma once
+
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <winsock2.h>
@@ -6,60 +8,61 @@
 #include <process.h>
 #include <WS2tcpip.h>
 #include <queue>
-
 #include "Network/Packets.h"
-
-#pragma comment (lib, "ws2_32.lib")
-
-#define MAX_BUFFER_SIZE 1024
-#define BUF_SIZE 100
-#define NAME_SIZE 20
-
-struct PacketData;
 
 class GameClient
 {
+    struct PacketData
+    {
+        GameClient* client = nullptr;
+        PacketType packetType;
+        void* packet;
+
+        PacketData(GameClient* client, PacketType packetType, void* packet)
+            : client(client), packetType(packetType), packet(packet)
+        {
+        }
+    };
+
 public:
-	GameClient(const char* ip, const char* port);
-	~GameClient();
+    static GameClient& Get() { return *Instance; }
 
-	void ConnectServer();
-	void RunThreads();
-	void RunSendThread(void* arg);
+    GameClient(const char* ip, const char* port);
+    ~GameClient();
 
-	static unsigned WINAPI Send(void* arg);
-	static unsigned WINAPI Receive(void* arg);
+    PacketData* CreatePacketData(PacketType packetType, void* packet);
+
+    void ConnectServer();
+    void RunThreads();
+    void RunSendThread(void* arg);
+
+    static unsigned WINAPI Send(void* arg);
+    static unsigned WINAPI Receive(void* arg);
 
     void EnqueueSend(PacketData* data);
     void ProcessPacket(char* packet);
 
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
-    inline std::queue<PacketData*>& SendQueue() { return sendQueue; }
+    inline std::queue<PacketData*>& GetSendQueue() { return sendQueue; }
+    inline int PlayerId() const{ return playerId; }
 
-	void ErrorHandling(const char* message);
+    void ErrorHandling(const char* message);
 
 private:
-	SOCKET hSocket;
-	SOCKADDR_IN serverAddress;
+    static GameClient* Instance;
 
-	HANDLE hSendThread, hReceiveThread;
-    HANDLE hSendMutex;
+    SOCKET hSocket = 0;
+    SOCKADDR_IN* serverAddress;
+
+    HANDLE hSendThread = nullptr;
+    HANDLE hReceiveThread = nullptr;
+    HANDLE hSendMutex = nullptr;
 
     std::queue<PacketData*> sendQueue;
 
-    int playerId;
-    bool isGameover;
-};
+    int playerId = 0;
+    bool isGameover = false;
 
-struct PacketData
-{
-    GameClient* client;
-    PacketType packetType;
-    void* packet;
-
-    PacketData(GameClient* client, PacketType packetType, void* packet)
-        : client(client), packetType(packetType), packet(packet)
-    {
-    }
+    static constexpr int maxBufferSize = 1024;
 };

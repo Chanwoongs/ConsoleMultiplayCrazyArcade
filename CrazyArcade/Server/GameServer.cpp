@@ -1,8 +1,9 @@
 ﻿#include "GameServer.h"
 
 GameServer::GameServer(const char* port)
-    : port(atoi(port)), clientCount(0), isRunning(true)
 {
+    serverAddress = new SOCKADDR_IN();
+
     WSADATA wsaData;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -16,17 +17,17 @@ GameServer::GameServer(const char* port)
         ErrorHandling("socket() error");
     }
 
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+    memset(serverAddress, 0, sizeof(SOCKADDR_IN));
+    serverAddress->sin_family = AF_INET;
+    serverAddress->sin_addr.s_addr = htonl(INADDR_ANY);
 
 #if TEST
-    serverAddress.sin_port = htons(9190);
+    serverAddress->sin_port = htons(9190);
 #else
-    serverAddress.sin_port = htons(atoi(port));
+    serverAddress->sin_port = htons(atoi(port));
 #endif
 
-    if (bind(hServerSocket, (SOCKADDR*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+    if (bind(hServerSocket, (SOCKADDR*)serverAddress, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
     {
         ErrorHandling("bind() error");
     }
@@ -38,6 +39,8 @@ GameServer::GameServer(const char* port)
 
     sendMutex = CreateMutex(NULL, FALSE, NULL); 
     sendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
+
+    isRunning = true;
 }
 
 GameServer::~GameServer()
@@ -53,6 +56,11 @@ GameServer::~GameServer()
     }
     CloseHandle(sendThread);
     CloseHandle(mutex);
+
+    if (serverAddress)
+    {
+        delete serverAddress;
+    }
 }
 
 void GameServer::AcceptClients()
@@ -88,7 +96,7 @@ void GameServer::AcceptClients()
         if (inet_ntop(AF_INET, &clientAddress.sin_addr, clientIP, sizeof(clientIP)))
         {
             printf("Connected client IP: %s \n", clientIP);
-        }
+        } 
         else
         {
             ErrorHandling("inet_ntop() error");
@@ -103,7 +111,7 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     SOCKET hClientSocket = clientHandleData->hClientSocket;
 
     int strLen = 0;
-    char buffer[MAX_BUFFER_SIZE] = {};
+    char buffer[maxBufferSize] = {};
 
     while ((strLen = recv(hClientSocket, buffer, sizeof(buffer), 0)) > 0)
     {
@@ -146,16 +154,16 @@ unsigned WINAPI GameServer::Send(void* arg)
 
             ReleaseMutex(server->sendMutex);
 
-            if (task->type == SendTaskType::SEND)
+            if (task->type == SendTask::Type::SEND)
             {
                 server->Send(task->clientSocket, task->packet);
             }
-            else if (task->type == SendTaskType::BROADCAST)
+            else if (task->type == SendTask::Type::BROADCAST)
             {
                 server->Broadcast(task->packet);
                 WaitForSingleObject(server->mutex, INFINITE);
 
-                char buffer[MAX_BUFFER_SIZE] = {};
+                char buffer[maxBufferSize] = {};
                 SerializePacket(task->packet, sizeof(buffer), buffer);
 
                 for (SOCKET client : server->clientSockets)
@@ -198,7 +206,7 @@ void GameServer::Send(SOCKET clientSocket, void* packet)
 {
     WaitForSingleObject(mutex, INFINITE);
 
-    char buffer[MAX_BUFFER_SIZE] = {};
+    char buffer[maxBufferSize] = {};
     SerializePacket(packet, sizeof(buffer), buffer);
 
     send(clientSocket, buffer, sizeof(buffer), 0);
@@ -210,7 +218,7 @@ void GameServer::Broadcast(void* packet)
 {
     WaitForSingleObject(mutex, INFINITE);
 
-    char buffer[MAX_BUFFER_SIZE] = {};
+    char buffer[maxBufferSize] = {};
     SerializePacket(packet, sizeof(buffer), buffer);
 
     for (SOCKET client : clientSockets)
@@ -225,7 +233,7 @@ void GameServer::EnqueueSend(SOCKET clientSocket, void* packet)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ SendTaskType::SEND, clientSocket, packet };
+    SendTask* task = new SendTask{ SendTask::Type::SEND, clientSocket, packet };
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);
@@ -235,7 +243,7 @@ void GameServer::EnqueueBroadcast(SOCKET clientSocket, void* packet)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ SendTaskType::BROADCAST, clientSocket, packet };
+    SendTask* task = new SendTask{ SendTask::Type::BROADCAST, clientSocket, packet };
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);
