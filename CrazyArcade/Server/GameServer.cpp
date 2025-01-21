@@ -1,4 +1,5 @@
 ﻿#include "GameServer.h"
+#include "EngineGame/Levels/GameLevel.h"
 
 GameServer::GameServer(const char* port)
 {
@@ -48,7 +49,7 @@ GameServer::~GameServer()
     closesocket(hServerSocket);
     WSACleanup();
 
-    WaitForMultipleObjects(clientThreads.size(), clientThreads.data(), TRUE, INFINITE);
+    WaitForMultipleObjects((DWORD)clientThreads.size(), clientThreads.data(), TRUE, INFINITE);
 
     for (auto& thread : clientThreads)
     {
@@ -72,6 +73,12 @@ void GameServer::AcceptClients()
         SOCKET clientSocket = accept(hServerSocket, (SOCKADDR*)&clientAddress, &clientAddressSize);
 
         WaitForSingleObject(mutex, INFINITE);
+
+        if (gameLevel == nullptr)
+        {
+            gameLevel = new GameLevel();
+            gameLevel->LoadMap();
+        }
 
         if (clientSockets.size() >= 8) 
         {
@@ -194,10 +201,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         break;
     case PacketType::PLAYER_ENTER_REQUEST:
         //@TODO: 랜덤 위치 생성 로직 
+        char buffer[maxBufferSize] = {};
+        size_t gameStateSize;
+        gameLevel->SerializeGameState(buffer, sizeof(buffer), gameStateSize);
+
         PlayerEnterRespondPacket* playerEnterRespondPacket =
-            new PlayerEnterRespondPacket(++playerCount, 5, 5);
+            new PlayerEnterRespondPacket(++playerCount, 5, 5, buffer, gameStateSize);
         
         EnqueueSend(clientSocket, (void*)playerEnterRespondPacket);
+
         break;
     }
 }

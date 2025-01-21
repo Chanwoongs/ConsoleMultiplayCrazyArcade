@@ -1,14 +1,11 @@
 ﻿#pragma once
 
-#include <vector>
-
 #include "Level/Level.h"
-#include "Math/Vector2.h"
-#include "EngineGame/Actors/Ground.h"
-#include "EngineGame/Actors/Wall.h"
-#include "EngineGame/Actors/Player.h"
+//#include "EngineGame/Actors/Ground.h"
+//#include "EngineGame/Actors/Wall.h"
+//#include "EngineGame/Actors/Player.h"
 
-// 소코반 게임 레벨
+class DrawableActor;
 class GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)
@@ -21,7 +18,10 @@ public:
 
     void LoadMap();
 
-    bool CanPlayerMove(const Vector2& position);
+    void SerializeGameState(char* buffer, size_t bufferSize, size_t& size);
+    void DeserializeGameState(const char* buffer, size_t size);
+
+    bool CanPlayerMove(const class Vector2& position);
 
 private:
     bool CheckGameClear();
@@ -30,7 +30,7 @@ private:
 
     std::vector<DrawableActor*> map;
 
-    std::vector<Player*> players;
+    std::vector<class Player*> players;
 
     bool isGameClear = false;
 };

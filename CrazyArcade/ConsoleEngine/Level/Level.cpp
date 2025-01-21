@@ -75,17 +75,3 @@ void Level::ProcessAddedAndDestroyActor()
         addRequestedActor.clear();
     }
 }
-
-//void Level::DestroyActor()
-//{
-//    for (int i = 0; i < actors.Size();)
-//    {
-//        if (actors[i]->isExpired)
-//        {
-//            delete actors[i];
-//            actors[i] = nullptr;
-//            actors.Erase(i);
-//        }
-//        ++i;
-//    }
-//}

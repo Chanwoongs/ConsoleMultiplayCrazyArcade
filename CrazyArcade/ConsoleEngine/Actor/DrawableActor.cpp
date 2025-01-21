@@ -18,6 +18,47 @@ DrawableActor::~DrawableActor()
     delete[] image;
 }
 
+void DrawableActor::Serialize(char* buffer)
+{
+    size_t offset = 0;
+
+    memcpy(buffer + offset, &width, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    memcpy(buffer + offset, &color, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    uint32_t imageLength = (uint32_t)strlen(image) + 1;
+    memcpy(buffer + offset, &imageLength, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    memcpy(buffer + offset, image, imageLength);
+}
+
+void DrawableActor::Deserialize(const char* buffer)
+{
+    size_t offset = 0;
+
+    memcpy(&width, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    memcpy(&color, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    uint32_t imageLength = 0;
+    memcpy(&imageLength, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    delete[] image; 
+    image = new char[imageLength];
+    memcpy(image, buffer + offset, imageLength);
+}
+
+size_t DrawableActor::SerializedSize() const 
+{
+    return sizeof(width) + sizeof(color) + strlen(image) + 1;
+}
+
 void DrawableActor::Draw()
 {
     Super::Draw();

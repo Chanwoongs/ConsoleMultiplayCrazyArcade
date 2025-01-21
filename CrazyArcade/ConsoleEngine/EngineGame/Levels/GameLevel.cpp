@@ -1,17 +1,20 @@
 ﻿#include "PrecompiledHeader.h"
 
 #include "GameLevel.h"
+#include "Math/Vector2.h"
 
 #include "Engine/Engine.h"
 #include "Engine/Timer.h"
+
+#include "EngineGame/Actors/Ground.h"
+#include "EngineGame/Actors/Wall.h"
+#include "EngineGame/Actors/Player.h"
 
 GameLevel::GameLevel()
 {
     system("cls");
     // 커서 감추기
     Engine::Get().SetCursorType(CursorType::NoCursor);
-
-    LoadMap();
 }
 
 void GameLevel::Update(float deltaTime)
@@ -174,4 +177,56 @@ void GameLevel::LoadMap()
     delete[] buffer;
 
     fclose(file);
+}
+
+void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& size)
+{
+    size_t offset = 0;
+
+    uint32_t mapCount = static_cast<uint32_t>(map.size());
+
+    if (offset + sizeof(mapCount) > bufferSize) 
+    {
+        throw std::overflow_error("Buffer too small to serialize map count");
+    }
+    memcpy(buffer + offset, &mapCount, sizeof(mapCount));
+    offset += sizeof(mapCount);
+
+    for (const auto& actor : map)
+    {
+        size_t actorSize = actor->SerializedSize();
+        if (offset + actorSize > bufferSize) 
+        {
+            throw std::overflow_error("Buffer too small to serialize map data");
+        }
+
+        actor->Serialize(buffer + offset);
+        offset += actorSize;
+    }
+
+    size = offset;
+}
+
+void GameLevel::DeserializeGameState(const char* buffer, size_t size) 
+{
+    for (auto& actor : map) 
+    {
+        delete actor; 
+    }
+    map.clear();
+
+    size_t offset = 0;
+
+    uint32_t mapCount;
+    memcpy(&mapCount, buffer + offset, sizeof(mapCount));
+    offset += sizeof(mapCount);
+
+    for (uint32_t i = 0; i < mapCount; ++i) 
+    {
+        DrawableActor* actor = new DrawableActor();
+        actor->Deserialize(buffer + offset);
+        offset += actor->SerializedSize();
+
+        map.push_back(actor);
+    }
 }

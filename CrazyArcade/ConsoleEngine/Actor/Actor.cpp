@@ -19,6 +19,11 @@ void Actor::Draw()
 {
 }
 
+void Actor::Serialize(const void* data, size_t dataSize, char* buffer)
+{
+    memcpy(buffer, data, dataSize);
+}
+
 void Actor::SetPosition(const Vector2& newPosition)
 {
     position = newPosition;

@@ -4,12 +4,25 @@
 
 class ENGINE_API DrawableActor : public Actor
 {
+public:
+    struct SerializeData
+    {
+        uint32_t width;
+        uint32_t color;
+        uint32_t imageLength;
+        char* image;
+    };
+
     // RTTI
     RTTI_DECLARATIONS(DrawableActor, Actor);
 
 public:
     DrawableActor(const char* image = "");
     virtual ~DrawableActor();
+
+    void Serialize(char* buffer);
+    void Deserialize(const char* buffer);
+    size_t SerializedSize() const;
 
     virtual void Draw() override;
     virtual void SetPosition(const Vector2& newPosition) override;

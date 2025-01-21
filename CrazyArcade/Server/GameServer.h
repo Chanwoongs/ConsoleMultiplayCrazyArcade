@@ -60,6 +60,8 @@ public:
     void EnqueueSend(SOCKET clientSocket, void* packet);
     void EnqueueBroadcast(SOCKET clientSocket, void* packet);
 
+    inline class GameLevel* GetGameLevel() { return gameLevel; }
+    inline bool IsRunning() { return isRunning; }
     inline void Stop() { isRunning = false; }
 
 	void ErrorHandling(const char* message) const;
@@ -82,6 +84,8 @@ private:
 	int clientCount = 0;
 
     bool isRunning = false;
+
+    class GameLevel* gameLevel = nullptr;
 
     static constexpr int maxBufferSize = 1024;
 };

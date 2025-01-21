@@ -22,6 +22,8 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Draw();
 
+    virtual void Serialize(const void* data, size_t dataSize, char* buffer);
+
     // Getter/Setter
     virtual void SetPosition(const Vector2& newPosition);
     inline Vector2 Position() const;

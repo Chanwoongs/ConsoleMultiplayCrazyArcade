@@ -3,6 +3,8 @@
 #include <iostream>
 #include <Core.h>
 
+#include "EngineGame/Levels/GameLevel.h"
+
 enum class ENGINE_API PacketType
 {
     INPUT = 1,
@@ -38,13 +40,27 @@ public:
     uint32_t playerId;
     uint32_t posY;
     uint32_t posX;
+    void* gameStateBuffer;
 
 public:
-    PlayerEnterRespondPacket(const uint32_t& playerId, const uint32_t& posY, const uint32_t& posX)
-        : playerId(playerId), posY(posY), posX(posX)
+    PlayerEnterRespondPacket(const uint32_t& playerId,
+        const uint32_t& posY, const uint32_t& posX,
+        const char* gameStateData)
+        : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr)
     {
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_RESPOND;
         header.packetSize = sizeof(PlayerEnterRespondPacket);
+
+        size_t gameStateSize = strlen(gameStateData) + 1;
+        gameStateBuffer = new char[gameStateSize];  
+        memcpy(gameStateBuffer, gameStateData, gameStateSize);  
+
+        header.packetSize += gameStateSize;  
+    }
+
+    ~PlayerEnterRespondPacket()
+    {
+        delete[] gameStateBuffer;
     }
 };
 
