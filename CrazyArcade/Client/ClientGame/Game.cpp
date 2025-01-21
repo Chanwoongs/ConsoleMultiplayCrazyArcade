@@ -61,6 +61,5 @@ void Game::RequestEnterGame()
 
 void Game::EnterGame()
 {
-    backLevel = menuLevel;
-    mainLevel = new GameLevel();
+    system("cls");
 }

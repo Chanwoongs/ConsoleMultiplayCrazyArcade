@@ -12,7 +12,7 @@
 Engine* Engine::Instance = nullptr;
 
 Engine::Engine()
-    : quit(false), mainLevel(nullptr), screenSize(80, 25)
+    : quit(false), mainLevel(nullptr), screenSize(80, 30)
 {
     // 랜덤 시드 설정
     srand((unsigned int)time(nullptr));

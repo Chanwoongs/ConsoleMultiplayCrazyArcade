@@ -24,22 +24,19 @@ int main(int argc, char* argv[])
     GameClient* client = new GameClient("127.0.0.1", "9190");
 #endif
     Game* game = new Game();
+    game->LoadLevel(new MenuLevel);
 
     client->RunThreads();
 
-    bool hasEnteredGame = false;
     while (true)
     {
         system("cls");
-        game->LoadLevel(new MenuLevel);
         game->Run();
 
-        if (game->GetKeyDown(VK_RETURN))
-        {
-            //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
-            //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
-            //client->AddPacketToSendQueue(packetData);
-        }
+        //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
+        //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
+        //client->AddPacketToSendQueue(packetData);
+        
     }
 
     delete game;

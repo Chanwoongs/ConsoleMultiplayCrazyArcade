@@ -143,7 +143,7 @@ unsigned WINAPI GameClient::Receive(void* arg)
 
         if (strLen > 0)
         {
-            client->ProcessPacket(buffer);
+            client->ProcessPacket(buffer, strLen);
         }
     }
     return 0;
@@ -156,26 +156,24 @@ void GameClient::EnqueueSend(PacketData* data)
     ReleaseMutex(hSendMutex);
 }
 
-void GameClient::ProcessPacket(char* packet)
+void GameClient::ProcessPacket(char* packet, int size)
 {
     PacketHeader* packetHeader = (PacketHeader*)packet;
 
     switch ((PacketType)packetHeader->packetType)
     {
     case PacketType::PLAYER_ENTER_RESPOND:
+        PlayerEnterRespondPacket receivedPacket(0, 0, 0, nullptr, 0);
+        receivedPacket.Deserialize(packet, size);
 
-        PlayerEnterRespondPacket* playerEnterRespondPacket = (PlayerEnterRespondPacket*)packet;
-        playerEnterRespondPacket->gameStateBuffer = new char[playerEnterRespondPacket->gameStateSize];
-        memcpy(playerEnterRespondPacket->gameStateBuffer, packet + sizeof(PacketHeader) + sizeof(uint32_t) * 4, playerEnterRespondPacket->gameStateSize);
-        playerId = playerEnterRespondPacket->playerId;
+        playerId = receivedPacket.playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
 
         Game::Get().LoadLevel(new GameLevel);
 
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
-        char* c = (char*)playerEnterRespondPacket->gameStateBuffer;
-        currentLevel->DeserializeGameState(c);
+        currentLevel->DeserializeGameState(receivedPacket.gameStateBuffer);
 
         Game::Get().EnterGame();
         break;

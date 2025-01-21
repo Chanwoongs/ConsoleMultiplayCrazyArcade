@@ -169,17 +169,6 @@ unsigned WINAPI GameServer::Send(void* arg)
             else if (task->type == SendTask::Type::BROADCAST)
             {
                 server->Broadcast(task->packet);
-                WaitForSingleObject(server->mutex, INFINITE);
-
-                char buffer[packetBufferSize] = {};
-                SerializePacket(task->packet, sizeof(buffer), buffer);
-
-                for (SOCKET client : server->clientSockets)
-                {
-                    send(client, buffer, sizeof(buffer), 0);
-                }
-
-                ReleaseMutex(server->mutex);
             }
             delete task->packet;
             delete task;
@@ -209,13 +198,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         PlayerEnterRespondPacket* playerEnterRespondPacket =
             new PlayerEnterRespondPacket(++playerCount, 5, 5, buffer, gameStateSize);
 
+        size_t serializedSize;
+        char* serializedData = playerEnterRespondPacket->Serialize(serializedSize);
+
         // EnqueueSend 호출
-        EnqueueSend(clientSocket, (void*)playerEnterRespondPacket);
+        EnqueueSend(clientSocket, (void*)serializedData);
 
         break;
     }
 }
-
 
 void GameServer::Send(SOCKET clientSocket, void* packet)
 {

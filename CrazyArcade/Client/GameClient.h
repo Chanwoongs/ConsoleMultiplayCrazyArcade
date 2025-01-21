@@ -40,7 +40,7 @@ public:
     static unsigned WINAPI Receive(void* arg);
 
     void EnqueueSend(PacketData* data);
-    void ProcessPacket(char* packet);
+    void ProcessPacket(char* packet, int size);
 
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
