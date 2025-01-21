@@ -33,5 +33,5 @@ protected:
 
     // 추가 요청된 액터
     // @TODO: 현재 하나의 액터만 추가 가능, 동적 배열로 만들어 생성할 개수 제한
-    Actor* addRequestedActor = nullptr;
+    std::vector<Actor*> addRequestedActor;
 };

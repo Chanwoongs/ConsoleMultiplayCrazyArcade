@@ -52,7 +52,10 @@ void GameLevel::Draw()
     }
     
     // 플레이어 그리기
-    //player->Draw();
+    for (auto& player : players)
+    {
+        player->Draw();
+    }
 }
 
 bool GameLevel::CanPlayerMove(const Vector2& position)
@@ -156,13 +159,13 @@ void GameLevel::LoadMap()
         if (mapChar == '1')
         {
             Wall* wall = new Wall(Vector2(xPosition, yPosition));
-            actors.PushBack(wall);
+            actors.push_back(wall);
             map.push_back(wall);
         }
         else if (mapChar == ' ')
         {
             Ground* ground = new Ground(Vector2(xPosition, yPosition));
-            actors.PushBack(ground);
+            actors.push_back(ground);
             map.push_back(ground);
         }
         ++xPosition;

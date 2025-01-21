@@ -30,7 +30,7 @@ private:
 
     std::vector<DrawableActor*> map;
 
-    std::vector<Player> players;
+    std::vector<Player*> players;
 
     bool isGameClear = false;
 };

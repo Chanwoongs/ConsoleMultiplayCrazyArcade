@@ -45,29 +45,34 @@ void Level::Draw()
 
 void Level::AddActor(Actor* newActor)
 {
-    //actors.PushBack(newActor);
-    addRequestedActor = newActor;
+    addRequestedActor.push_back(newActor);
 }
 
 void Level::ProcessAddedAndDestroyActor()
 {
     // 삭제 요청된 액터 처리
-    for (int i = 0; i < actors.Size();)
+    for (auto it = actors.begin(); it != actors.end(); )
     {
-        if (actors[i]->isExpired)
+        if ((*it)->isExpired)
         {
-            delete actors[i];
-            actors[i] = nullptr;
-            actors.Erase(i);
+            delete *it;
+            it = actors.erase(it);
         }
-        ++i;
+        else
+        {
+            ++it;
+        }
     }
 
     // 추가 요청된 액터 처리
-    if (addRequestedActor)
+    if (addRequestedActor.size())
     {
-        actors.PushBack(addRequestedActor);
-        addRequestedActor = nullptr;
+        for (auto& actor : addRequestedActor)
+        {
+            actors.push_back(actor);
+        }
+        
+        addRequestedActor.clear();
     }
 }
 
