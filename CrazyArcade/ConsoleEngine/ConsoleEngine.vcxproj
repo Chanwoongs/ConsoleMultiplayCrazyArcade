@@ -197,9 +197,7 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\ConsoleEngineLib\ /e /y</Comman
   <ItemGroup>
     <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="Actor\DrawableActor.cpp" />
-    <ClCompile Include="EngineGame\Actors\Box.cpp" />
     <ClCompile Include="EngineGame\Actors\Ground.cpp" />
-    <ClCompile Include="EngineGame\Actors\Target.cpp" />
     <ClCompile Include="EngineGame\Actors\Wall.cpp" />
     <ClCompile Include="Engine\Engine.cpp" />
     <ClCompile Include="Engine\Timer.cpp" />
@@ -218,9 +216,7 @@ xcopy $(OutDir)\ConsoleEngine.lib $(SolutionDir)\ConsoleEngineLib\ /e /y</Comman
     <ClInclude Include="Actor\DrawableActor.h" />
     <ClInclude Include="Container\List.h" />
     <ClInclude Include="Core.h" />
-    <ClInclude Include="EngineGame\Actors\Box.h" />
     <ClInclude Include="EngineGame\Actors\Ground.h" />
-    <ClInclude Include="EngineGame\Actors\Target.h" />
     <ClInclude Include="EngineGame\Actors\Wall.h" />
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\Timer.h" />

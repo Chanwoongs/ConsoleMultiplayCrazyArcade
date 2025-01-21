@@ -5,8 +5,6 @@
 
 #include "EngineGame/Actors/Ground.h"
 #include "EngineGame/Actors/Wall.h"
-#include "EngineGame/Actors/Box.h"
-#include "EngineGame/Actors/Target.h"
 
 #include "ClientGame/Player.h"
 

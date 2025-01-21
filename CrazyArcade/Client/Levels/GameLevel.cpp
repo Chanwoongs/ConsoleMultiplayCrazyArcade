@@ -82,7 +82,7 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
     }
 
     // 검색한 액터가 이동 가능한 액터 (땅/타겟)인지 확인
-    if (searchedActor->As<Ground>() || searchedActor->As<Target>())
+    if (searchedActor->As<Ground>())
     {
         return true;
     }

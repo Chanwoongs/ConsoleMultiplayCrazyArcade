@@ -4,8 +4,14 @@
 
 MenuLevel::MenuLevel()
 {
-	menuItems.PushBack(new MenuItem("Resume Game", []() { Game::Get().ToggleMenu(); }));
-	menuItems.PushBack(new MenuItem("Quit Game", []() { Game::Get().QuitGame(); }));
+	menuItems.PushBack(new MenuItem("Start Game", []() 
+        { 
+            Game::Get().RequestEnterGame();
+        }));
+	menuItems.PushBack(new MenuItem("Quit Game", []() 
+        { 
+            Game::Get().QuitGame(); 
+        }));
 	length = menuItems.Size();
 }
 
@@ -19,11 +25,6 @@ MenuLevel::~MenuLevel()
 
 void MenuLevel::Update(float deltaTime)
 {
-	if (Game::Get().GetKeyDown(VK_ESCAPE))
-	{
-		Game::Get().ToggleMenu();
-	}
-
 	if (Game::Get().GetKeyDown(VK_UP))
 	{
 		currentIndex = (currentIndex - 1 + length) % length;
@@ -46,7 +47,7 @@ void MenuLevel::Draw()
 	Engine::Get().SetCursorPosition(0, 0);
 	
 	SetColor(unselectedColor);
-	Log("Sokoban Game\n\n");
+	Log("Slither Game!\n\n");
 
 	for (int ix = 0; ix < length; ++ix)
 	{
