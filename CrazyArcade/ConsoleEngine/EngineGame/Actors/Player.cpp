@@ -17,7 +17,7 @@ void Player::Serialize(char* buffer, size_t& size)
 {
     Super::Serialize(buffer, size);
 
-    size_t offset = 0;
+    size_t offset = size;
 
     memcpy(buffer + offset, &id, sizeof(uint32_t));
     offset += sizeof(uint32_t);
@@ -29,7 +29,7 @@ void Player::Deserialize(const char* buffer, size_t& size)
 {
     Super::Deserialize(buffer, size);
 
-    size_t offset = 0;
+    size_t offset = size;
 
     memcpy(&id, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);

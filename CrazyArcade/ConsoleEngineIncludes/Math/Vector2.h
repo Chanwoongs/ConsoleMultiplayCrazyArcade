@@ -25,23 +25,31 @@ public:
     bool operator!=(const Vector2& other);
 
     // 직렬화 함수
-    void Serialize(char* buffer, size_t& offset) const
+    void Serialize(char* buffer, size_t& size) const
     {
+        size_t offset = size;
+
         memcpy(buffer + offset, &x, sizeof(uint32_t));
         offset += sizeof(uint32_t);
 
         memcpy(buffer + offset, &y, sizeof(uint32_t));
         offset += sizeof(uint32_t);
+
+        size += offset;
     }
 
     // 역직렬화 함수
-    void Deserialize(const char* buffer, size_t& offset)
+    void Deserialize(const char* buffer, size_t& size)
     {
+        size_t offset = size;
+
         memcpy(&x, buffer + offset, sizeof(uint32_t));
         offset += sizeof(uint32_t);
 
         memcpy(&y, buffer + offset, sizeof(uint32_t));
         offset += sizeof(uint32_t);
+
+        size += offset;
     }
 
 public:

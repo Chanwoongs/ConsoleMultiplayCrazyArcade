@@ -21,7 +21,7 @@ void Actor::Draw()
 
 void Actor::Serialize(char* buffer, size_t& size)
 {
-    size_t offset = 0;
+    size_t offset = size;
 
     size_t positionSize = 0;
     position.Serialize(buffer + offset, positionSize);
@@ -32,7 +32,7 @@ void Actor::Serialize(char* buffer, size_t& size)
 
 void Actor::Deserialize(const char* buffer, size_t& size)
 {
-    size_t offset = 0;
+    size_t offset = size;
 
     size_t positionSize = 0;
     position.Deserialize(buffer + offset, positionSize);
