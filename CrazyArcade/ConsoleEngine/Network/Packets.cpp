@@ -9,5 +9,15 @@ void ENGINE_API SerializePacket(const void* packet, size_t packetSize, char* buf
 
 void ENGINE_API DeserializePacket(void* packet, size_t packetSize, const char* buffer)
 {
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     memcpy(packet, buffer, packetSize);
+
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
 }

@@ -4,6 +4,14 @@
 #include <Core.h>
 
 #include "EngineGame/Levels/GameLevel.h"
+#include <new.h>
+
+static void __cdecl NewExceptionHandler()
+{
+    OutputDebugStringA("Failed to allocate memory\n");
+    ExitProcess(false);
+    return;
+}
 
 enum class ENGINE_API PacketType
 {
@@ -49,12 +57,30 @@ public:
         const char* gameStateData, size_t gameStateSize)
         : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr), gameStateSize((uint32_t)gameStateSize)
     {
+        set_new_handler(NewExceptionHandler);
+        
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_RESPOND;
         header.packetSize = sizeof(PlayerEnterRespondPacket);
+        try
+        {
+            auto test = new char[100];
+            gameStateBuffer = new char[gameStateSize + 1];
+        }
+        catch (const std::exception& ex)
+        {
+            __debugbreak();
+            return;
+        }
 
-        gameStateBuffer = new char[gameStateSize + 1];  
         gameStateBuffer[gameStateSize] = '\0';
         memcpy(gameStateBuffer, gameStateData, gameStateSize);
+        
+
+        //error = _heapchk();
+        //if (error != _HEAPOK)
+        //{
+        //    DebugBreak();
+        //}
 
         header.packetSize += (uint32_t)gameStateSize;
     }

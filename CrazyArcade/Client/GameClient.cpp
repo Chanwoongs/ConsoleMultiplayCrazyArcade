@@ -115,7 +115,7 @@ unsigned WINAPI GameClient::Send(void* arg)
             void* packet = packetData->packet;
             
             char buffer[maxBufferSize] = {};
-            SerializePacket(packet, sizeof(buffer), buffer);
+            SerializePacket(packet, sizeof(packet), buffer);
             send(hSocket, buffer, sizeof(buffer), 0);
 
             delete packet;

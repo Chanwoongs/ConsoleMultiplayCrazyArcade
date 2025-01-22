@@ -46,10 +46,10 @@ Engine::Engine()
     emptyStringBuffer[screenSize.y * (screenSize.x + 1)] = '\0';
 
     // 디버깅
-#if _DEBUG
-    char buffer[2048];
-    strcpy_s(buffer, 2048, emptyStringBuffer);
-#endif
+//#if _DEBUG
+//    char buffer[2048];
+//    strcpy_s(buffer, 2048, emptyStringBuffer);
+//#endif
 }
 
 Engine::~Engine()

@@ -47,6 +47,8 @@ GameServer::GameServer(const char* port)
 
 GameServer::~GameServer()
 {
+    delete gameLevel;
+
     closesocket(hServerSocket);
     WSACleanup();
 
@@ -93,12 +95,26 @@ void GameServer::AcceptClients()
         ++clientCount;
         ReleaseMutex(mutex);
 
+        auto error = _heapchk();
+
+        if (error != _HEAPOK)
+        {
+            DebugBreak();
+        }
+
         ClientHandleData* clientHandleData = new ClientHandleData{ this, clientSocket };
         HANDLE threadHandle = (HANDLE)_beginthreadex(NULL, 0, HandleClient, (void*)clientHandleData, 0, NULL);
 
         WaitForSingleObject(mutex, INFINITE);
         clientThreads.push_back(threadHandle); 
         ReleaseMutex(mutex);
+
+        error = _heapchk();
+
+        if (error != _HEAPOK)
+        {
+            DebugBreak();
+        }
 
         char clientIP[20] = { 0 };
         if (inet_ntop(AF_INET, &clientAddress.sin_addr, clientIP, sizeof(clientIP)))
@@ -109,6 +125,13 @@ void GameServer::AcceptClients()
         {
             ErrorHandling("inet_ntop() error");
         }
+
+        error = _heapchk();
+
+        if (error != _HEAPOK)
+        {
+            DebugBreak();
+        }
     }
 }
 
@@ -118,17 +141,50 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
     GameServer* server = clientHandleData->server;
     SOCKET hClientSocket = clientHandleData->hClientSocket;
 
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     int strLen = 0;
     char buffer[packetBufferSize] = {};
 
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     while ((strLen = recv(hClientSocket, buffer, sizeof(buffer), 0)) > 0)
     {
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
+
         char* packet = new char[strLen];
-        DeserializePacket(packet, strlen(packet), buffer);
+        memset(packet, 0, strLen);
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
+
+        //DeserializePacket(packet, strlen(packet), buffer);
+        DeserializePacket(packet, strlen(buffer), buffer);
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
         
         server->ProcessPacket(hClientSocket, packet);
 
         strLen = 0;
+    }
+
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
     }
 
     WaitForSingleObject(server->mutex, INFINITE);
@@ -140,10 +196,26 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
         --server->clientCount;
     }
 
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     ReleaseMutex(server->mutex);
     closesocket(hClientSocket);
 
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     delete clientHandleData;
+
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+
     return 0;
 }
 
@@ -190,13 +262,35 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     case PacketType::MOVE:
         break;
     case PacketType::PLAYER_ENTER_REQUEST:
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
+
         //@TODO: 랜덤 위치 생성 로직 
         char buffer[gameStateBufferSize] = {};
         size_t gameStateSize = 0;
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
+
         gameLevel->SerializeGameState(buffer, gameStateBufferSize, gameStateSize);
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
 
         PlayerEnterRespondPacket* playerEnterRespondPacket =
             new PlayerEnterRespondPacket(++playerCount, 5, 5, buffer, gameStateSize);
+
+        if (_heapchk() != _HEAPOK)
+        {
+            DebugBreak();
+        }
 
         size_t serializedSize;
         char* serializedData = playerEnterRespondPacket->Serialize(serializedSize);
