@@ -19,9 +19,26 @@ void Actor::Draw()
 {
 }
 
-void Actor::Serialize(const void* data, size_t dataSize, char* buffer)
+void Actor::Serialize(char* buffer, size_t& size)
 {
-    memcpy(buffer, data, dataSize);
+    size_t offset = 0;
+
+    size_t positionSize = 0;
+    position.Serialize(buffer + offset, positionSize);
+    offset += positionSize;
+
+    size += offset;
+}
+
+void Actor::Deserialize(const char* buffer, size_t& size)
+{
+    size_t offset = 0;
+
+    size_t positionSize = 0;
+    position.Deserialize(buffer + offset, positionSize);
+    offset += positionSize;
+
+    size += offset;
 }
 
 void Actor::SetPosition(const Vector2& newPosition)

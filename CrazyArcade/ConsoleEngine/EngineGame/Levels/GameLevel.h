@@ -10,6 +10,7 @@ public:
     GameLevel();
     ~GameLevel();
 
+    virtual void AddActor(Actor* newActor) override;
     virtual void Update(float deltaTime) override;
     virtual void Draw() override;
 

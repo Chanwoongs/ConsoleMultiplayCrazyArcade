@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 
     /*    GameLevel* gameLevel = new GameLevel;
         gameLevel->LoadMap();*/
+        Engine* engine = new Engine();
 
         while (server->IsRunning())
         {
@@ -40,6 +41,7 @@ int main(int argc, char* argv[])
 
         WaitForSingleObject(acceptThread, INFINITE);
         CloseHandle(acceptThread);
+        delete engine;
         delete server;
     }
     catch (const std::exception& ex)

@@ -2,9 +2,11 @@
 #include "DrawableActor.h"
 #include "Engine/Engine.h"
 
-DrawableActor::DrawableActor(const char* image)
+DrawableActor::DrawableActor(Vector2 position, const char* image)
     : Actor()
 {
+    this->position = position;
+
     auto length = strlen(image) + 1;
     this->image = new char[length];
     strcpy_s(this->image, length, image);
@@ -20,6 +22,8 @@ DrawableActor::~DrawableActor()
 
 void DrawableActor::Serialize(char* buffer, size_t& size)
 {
+    Super::Serialize(buffer, size);
+
     size_t offset = 0;
 
     memcpy(buffer + offset, &width, sizeof(uint32_t));
@@ -40,6 +44,8 @@ void DrawableActor::Serialize(char* buffer, size_t& size)
 
 void DrawableActor::Deserialize(const char* buffer, size_t& size)
 {
+    Super::Deserialize(buffer, size);
+
     size_t offset = 0;
 
     memcpy(&width, buffer + offset, sizeof(uint32_t));
@@ -77,6 +83,8 @@ void DrawableActor::Draw()
 
     // 색상 설정
     SetColor(Color::White);
+
+    Engine::Get().SetCursorPosition(Vector2(0, 0));
 }
 
 void DrawableActor::SetPosition(const Vector2& newPosition)
@@ -87,6 +95,22 @@ void DrawableActor::SetPosition(const Vector2& newPosition)
 
     // 위치를 새로 옮기기
     Super::SetPosition(newPosition);
+}
+
+void DrawableActor::SetImage(const char* newImage)
+{
+    if (newImage == nullptr)
+        return;
+
+    delete[] image;
+
+    size_t imageLength = strlen(newImage);
+
+    image = new char[imageLength + 1]; 
+
+    strcpy_s(image, imageLength + 1,newImage);
+
+    width = (int)imageLength;
 }
 
 bool DrawableActor::Intersect(const DrawableActor& other)

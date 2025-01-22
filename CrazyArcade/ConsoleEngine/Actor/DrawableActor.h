@@ -17,14 +17,15 @@ public:
     RTTI_DECLARATIONS(DrawableActor, Actor);
 
 public:
-    DrawableActor(const char* image = "");
+    DrawableActor(Vector2 position, const char* image = "");
     virtual ~DrawableActor();
 
-    virtual void Serialize(char* buffer, size_t& size);
-    virtual void Deserialize(const char* buffer, size_t& size);
+    virtual void Serialize(char* buffer, size_t& size) override;
+    virtual void Deserialize(const char* buffer, size_t& size) override;
 
     virtual void Draw() override;
     virtual void SetPosition(const Vector2& newPosition) override;
+    void SetImage(const char* newImage);
 
     // 충돌 확인 함수
     bool Intersect(const DrawableActor& other);

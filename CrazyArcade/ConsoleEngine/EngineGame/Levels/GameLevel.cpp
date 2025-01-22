@@ -12,12 +12,12 @@
 
 GameLevel::GameLevel()
 {
-    //system("cls");
+    system("cls");
     // 커서 감추기
 
     Engine::Get().SetCursorType(CursorType::NoCursor);
 
-    map = new DrawableActor();
+    map = new DrawableActor(Vector2(0, 0));
 }
 
 GameLevel::~GameLevel()
@@ -25,6 +25,16 @@ GameLevel::~GameLevel()
     for (auto& pos : wallPositions)
     {
         delete pos;
+    }
+}
+
+void GameLevel::AddActor(Actor* newActor)
+{
+    Super::AddActor(newActor);
+
+    if (newActor->As<Player>())
+    {
+        players.push_back(static_cast<Player*>(newActor));
     }
 }
 
@@ -66,9 +76,12 @@ void GameLevel::Draw()
     }
     
     // 플레이어 그리기
-    for (auto& player : players)
+    if (players.size() > 0)
     {
-        player->Draw();
+        for (auto& player : players)
+        {
+            player->Draw();
+        }
     }
 }
 
@@ -138,9 +151,10 @@ void GameLevel::LoadMap()
     }
 
     buffer[readSize] = '\0';
-    map = new DrawableActor(buffer);
 
-    // 파일 읽을 때 사용할 인덱스
+    map->SetImage(buffer);
+
+    // 파일 읽을 때 사용할 인덱 스
     int index = 0;
 
     // 좌표 계산을 위한 변수 선언
@@ -183,6 +197,17 @@ void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outS
     //size_t size = 0;
     //map->Deserialize(buffer, size);
 
+    uint32_t playerCount = static_cast<uint32_t>(players.size());
+    memcpy(buffer + offset, &playerCount, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    for (auto* player : players)
+    {
+        size_t playerSize = 0;
+        player->Serialize(buffer + offset, playerSize);
+        offset += playerSize;
+    }
+
     outSize = offset;
 }
 
@@ -193,4 +218,23 @@ void GameLevel::DeserializeGameState(const char* buffer)
     size_t mapSize = 0;
     map->Deserialize(buffer + offset, mapSize);
     offset += mapSize;
+
+    uint32_t playerCount = 0;
+    memcpy(&playerCount, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    for (auto* player : players)
+    {
+        delete player;
+    }
+    players.clear();
+
+    for (uint32_t i = 0; i < playerCount; ++i)
+    {
+        size_t playerSize = 0;
+        auto* newPlayer = new Player(0, Vector2(0, 0), this);
+        newPlayer->Deserialize(buffer + offset, playerSize);
+        AddActor(newPlayer);
+        offset += playerSize;
+    }
 }

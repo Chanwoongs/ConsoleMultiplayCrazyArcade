@@ -3,12 +3,16 @@
 #include "Actor/DrawableActor.h"
 
 class GameLevel;
-class Player : public DrawableActor
+class ENGINE_API Player : public DrawableActor
 {
     RTTI_DECLARATIONS(Player, DrawableActor)
 
 public:
-   Player(const Vector2& position, GameLevel* level);
+    Player() = default;
+    Player(int id, const Vector2& position, GameLevel* level);
+
+    virtual void Serialize(char* buffer, size_t& size) override;
+    virtual void Deserialize(const char* buffer, size_t& size) override;
 
     virtual void Update(float deltaTime) override;
 

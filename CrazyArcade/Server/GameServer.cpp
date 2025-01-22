@@ -1,6 +1,8 @@
 ﻿#include "GameServer.h"
 
+#include "Engine/Engine.h"
 #include "EngineGame/Levels/GameLevel.h"
+#include "EngineGame/Actors/Player.h"
 
 GameServer::GameServer(const char* port)
 {
@@ -277,7 +279,11 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             DebugBreak();
         }
 
+        WaitForSingleObject(mutex, INFINITE);
+
+        gameLevel->AddActor(new Player(++playerCount, Vector2(playerCount, playerCount), gameLevel));
         gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
+
 
         if (_heapchk() != _HEAPOK)
         {
@@ -285,7 +291,9 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         }
 
         PlayerEnterRespondPacket* playerEnterRespondPacket =
-            new PlayerEnterRespondPacket(++playerCount, 5, 5, buffer, gameStateSize);
+            new PlayerEnterRespondPacket(playerCount, playerCount + 1, playerCount + 1, buffer, gameStateSize);
+
+        ReleaseMutex(mutex);
 
         if (_heapchk() != _HEAPOK)
         {
