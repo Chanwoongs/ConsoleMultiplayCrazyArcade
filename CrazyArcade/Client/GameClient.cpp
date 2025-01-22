@@ -116,7 +116,7 @@ unsigned WINAPI GameClient::Send(void* arg)
             
             char buffer[packetBufferSize] = {};
             SerializePacket(packet, packetData->size, buffer);
-            send(hSocket, buffer, packetData->size, 0);
+            send(hSocket, buffer, (int)packetData->size, 0);
 
             delete packet;
         }
@@ -168,10 +168,13 @@ void GameClient::ProcessPacket(char* packet, int size)
 
         printf("부여 받은 PlayerId : %d", playerId);
 
+        WaitForSingleObject(hReceiveMutex, INFINITE);
         Game::Get().LoadLevel(new GameLevel);
 
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
+
         currentLevel->DeserializeGameState(playerEnterRespondPacket.gameStateBuffer);
+        ReleaseMutex(hReceiveMutex);
 
         Game::Get().EnterGame();
     }
@@ -179,11 +182,13 @@ void GameClient::ProcessPacket(char* packet, int size)
     {
         if (!hasEnteredGame) return;
 
+        WaitForSingleObject(hReceiveMutex, INFINITE);
         GameStateSynchronizePacket gameStateSynchronizePacket(0, nullptr);
         gameStateSynchronizePacket.Deserialize(packet, size);
 
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
         currentLevel->DeserializeGameState(gameStateSynchronizePacket.gameStateBuffer);
+        ReleaseMutex(hReceiveMutex);
     }
 }
 

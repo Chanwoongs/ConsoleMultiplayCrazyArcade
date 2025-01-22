@@ -66,6 +66,7 @@ private:
     HANDLE hSendThread = nullptr;
     HANDLE hReceiveThread = nullptr;
     HANDLE hSendMutex = nullptr;
+    HANDLE hReceiveMutex = nullptr;
 
     std::queue<PacketData*> sendQueue;
 

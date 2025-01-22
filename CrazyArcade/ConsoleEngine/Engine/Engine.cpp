@@ -11,9 +11,23 @@
 // 스태틱 변수 초기화
 Engine* Engine::Instance = nullptr;
 
+BOOL WINAPI WindowEventHandler(DWORD CtrlType)
+{
+    if (CtrlType == CTRL_CLOSE_EVENT)
+    {
+        Engine::Get().QuitGame();
+        return true;
+    }
+
+    return false;
+}
+
 Engine::Engine()
     : quit(false), mainLevel(nullptr), screenSize(80, 30)
 {
+    // 윈도우 창 버튼 입력 핸들러 등록.
+    SetConsoleCtrlHandler(WindowEventHandler, true);
+
     // 랜덤 시드 설정
     srand((unsigned int)time(nullptr));
 

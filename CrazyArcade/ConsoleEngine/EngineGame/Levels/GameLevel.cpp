@@ -73,6 +73,29 @@ void GameLevel::Update(float deltaTime)
         Engine::Get().QuitGame();
     }
 
+    if (!isThreadWriting)
+    {
+        if (tempPlayers.size() > 0)
+        {
+            if (players.size() > 0)
+            {
+                for (Actor* actor : players)
+                {
+                    delete actor;
+                }
+
+                players.clear();
+            }
+
+            for (Player* player : tempPlayers)
+            {
+                players.push_back(player);
+            }
+
+            tempPlayers.clear();
+        }
+    }
+
     if (players.size() > 0)
     {
         for (auto& player : players)
@@ -80,12 +103,20 @@ void GameLevel::Update(float deltaTime)
             player->Update(deltaTime);
         }
     }
+
+    //if (tempMap != nullptr)
+
+    //{
+    //    delete map;
+    //    map = tempMap;
+    //    tempMap = nullptr; 
+    //}
 }
 
 void GameLevel::Draw()
 {
     // 맵 그리기    
-    if (map)
+    if (map != nullptr)
     {
         map->Draw();
     }
@@ -93,9 +124,12 @@ void GameLevel::Draw()
     // 플레이어 그리기
     if (players.size() > 0)
     {
-        for (auto& player : players)
+        for (auto* player : players)
         {
-            player->Draw();
+            if (player != nullptr)
+            {
+                player->Draw();
+            }
         }
     }
 }
@@ -205,6 +239,7 @@ void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outS
 {
     size_t offset = 0;
 
+
     size_t mapSize = 0;
     map->Serialize(buffer + offset, mapSize);
     offset += mapSize;
@@ -228,28 +263,44 @@ void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outS
 
 void GameLevel::DeserializeGameState(const char* buffer)
 {
+    if (tempPlayers.size() > 0) //|| tempMap != nullptr)
+    {
+        return;
+    }
+
+    isThreadWriting = true;
+
     size_t offset = 0;
 
     size_t mapSize = 0;
     map->Deserialize(buffer + offset, mapSize);
-    offset += mapSize;
+    offset += mapSize;  
+    //size_t mapSize = 0;
+    //tempMap = new DrawableActor(Vector2(0, 0));
+    //tempMap->Deserialize(buffer + offset, mapSize);
+    //offset += mapSize;
 
     uint32_t playerCount = 0;
     memcpy(&playerCount, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
-    for (auto* player : players)
-    {
-        delete player;
-    }
-    players.clear();
+    //for (auto* player : players)
+    //{
+    //    delete player;
+    //}
+    //players.clear();
 
     for (uint32_t i = 0; i < playerCount; ++i)
     {
         size_t playerSize = 0;
         auto* newPlayer = new Player(0, Vector2(0, 0), this);
         newPlayer->Deserialize(buffer + offset, playerSize);
-        AddActor(newPlayer);
+        tempPlayers.push_back(newPlayer);
         offset += playerSize;
+
+        //AddActor(newPlayer);
+        //offset += playerSize;
     }
+
+    isThreadWriting = false;
 }

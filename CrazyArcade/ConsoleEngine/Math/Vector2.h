@@ -38,7 +38,7 @@ public:
 
 public:
     // x좌표, y좌표
-    int x = 0;
-    int y = 0;
+    int32_t x = 0;
+    int32_t y = 0;
 
 };

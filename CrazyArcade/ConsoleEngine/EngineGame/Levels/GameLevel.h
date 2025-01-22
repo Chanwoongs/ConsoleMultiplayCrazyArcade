@@ -33,4 +33,12 @@ private:
     std::vector<class Vector2*> wallPositions;
      
     bool isGameClear = false;
+
+    bool isMapInitialized = false;
+
+    class DrawableActor* tempMap;
+
+    std::vector<class Player*> tempPlayers;
+
+    bool isThreadWriting = false;
 };

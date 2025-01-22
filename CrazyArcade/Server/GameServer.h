@@ -89,6 +89,7 @@ private:
 	int clientCount = 0;
 
     bool isRunning = false;
+    bool isMapInitialzed = false;
 
     class GameLevel* gameLevel = nullptr;
 

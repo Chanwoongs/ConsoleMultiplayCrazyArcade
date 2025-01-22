@@ -2,6 +2,8 @@
 #include "DrawableActor.h"
 #include "Engine/Engine.h"
 
+#include <iostream>
+
 DrawableActor::DrawableActor(Vector2 position, const char* image)
     : Actor()
 {
@@ -51,7 +53,7 @@ void DrawableActor::Deserialize(const char* buffer, size_t& size)
     memcpy(&width, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
-     memcpy(&color, buffer + offset, sizeof(uint32_t));
+    memcpy(&color, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
     uint32_t imageLength = 0;
@@ -79,7 +81,8 @@ void DrawableActor::Draw()
     Engine::Get().SetCursorPosition(position);
 
     // 2단계: 그리기 (콘솔 출력)
-    Log(image);
+    //Log("%s", image);
+    std::cout << image;
 
     // 색상 설정
     SetColor(Color::White);

@@ -250,6 +250,7 @@ unsigned WINAPI GameServer::Send(void* arg)
         else 
         {
             ReleaseMutex(server->sendMutex);
+            Sleep(10);
         }
     }
     return 0;
@@ -323,7 +324,7 @@ void GameServer::Send(SendTask* task)
     char buffer[packetBufferSize] = {};
     SerializePacket(task->packet, task->size, buffer);
 
-    send(task->clientSocket, buffer, task->size, 0);
+    send(task->clientSocket, buffer, (int)task->size, 0);
 
     ReleaseMutex(mutex);
 }
@@ -337,7 +338,7 @@ void GameServer::Broadcast(SendTask* task)
 
     for (SOCKET client : clientSockets)
     {
-        send(client, buffer, task->size, 0);
+        send(client, buffer, (int)task->size, 0);
     }
 
     ReleaseMutex(mutex);

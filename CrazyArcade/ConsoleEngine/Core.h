@@ -38,7 +38,10 @@ void SafeDelete(T* pointer)
 template<typename... T>
 void Log(const char* format, T&&... args)
 {
+    if (format == nullptr) return;
+
 	char buffer[2048];
+    memset(buffer, 0, 2048);
 	snprintf(buffer, 2048, format, args ...);
 	std::cout << buffer;
 }

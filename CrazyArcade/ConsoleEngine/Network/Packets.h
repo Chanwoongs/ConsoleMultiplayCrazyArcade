@@ -135,7 +135,7 @@ public:
     char* gameStateBuffer;
 
     GameStateSynchronizePacket(size_t gameStateSize, char* gameStateData)
-        : gameStateBuffer(gameStateData), gameStateSize(gameStateSize)
+        : gameStateBuffer(gameStateData), gameStateSize((uint32_t)gameStateSize)
     {
         header.packetType = (uint32_t)PacketType::GAME_STATE_SYNCHRONIZE;
         header.packetSize = sizeof(GameStateSynchronizePacket);
