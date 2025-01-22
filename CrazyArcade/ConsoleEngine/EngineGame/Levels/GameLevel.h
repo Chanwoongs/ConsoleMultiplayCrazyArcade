@@ -46,7 +46,5 @@ private:
 
     bool isThreadWriting = false;
 
-    std::queue<std::pair<int, Direction>> moveQueue;
-
     HANDLE mutex = 0;
 };

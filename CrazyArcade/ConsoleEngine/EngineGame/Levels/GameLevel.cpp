@@ -77,6 +77,8 @@ void GameLevel::Update(float deltaTime)
 
     if (!isThreadWriting)
     {
+        WaitForSingleObject(mutex, INFINITE);
+
         if (tempPlayers.size() > 0)
         {
             if (players.size() > 0)
@@ -96,6 +98,7 @@ void GameLevel::Update(float deltaTime)
 
             tempPlayers.clear();
         }
+        ReleaseMutex(mutex); 
     }
 
     if (players.size() > 0)
@@ -164,34 +167,6 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 
 void GameLevel::MovePlayer(int playerId, Direction direction)
 {
-    //moveQueue.push(std::make_pair(playerId, direction));
-
-    //if (!moveQueue.empty())
-    //{
-    //    auto move = moveQueue.front();
-    //    moveQueue.pop();
-
-    //    Vector2 position = players[move.first]->Position();
-
-    //    switch (move.second)
-    //    {
-    //    case Direction::UP:
-    //        --position.y;
-    //        break;
-    //    case Direction::DOWN:
-    //        ++position.y;
-    //        break;
-    //    case Direction::RIGHT:
-    //        ++position.x;
-    //        break;
-    //    case Direction::LEFT:
-    //        --position.x;
-    //        break;
-    //    }
-
-    //    players[move.first]->SetPosition(position);
-    //}
-
     if (playerId <= 0) return;
 
     WaitForSingleObject(mutex, INFINITE);
@@ -305,6 +280,8 @@ void GameLevel::LoadMap()
 
 void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outSize)
 {
+    WaitForSingleObject(mutex, INFINITE);
+
     size_t offset = 0;
 
     size_t mapSize = 0;
@@ -326,10 +303,14 @@ void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outS
     }
 
     outSize = offset;
+
+    ReleaseMutex(mutex);
 }
 
 void GameLevel::DeserializeGameState(const char* buffer)
 {
+    WaitForSingleObject(mutex, INFINITE);
+
     if (tempPlayers.size() > 0 || tempMap != nullptr)
     {
         return;
@@ -371,4 +352,6 @@ void GameLevel::DeserializeGameState(const char* buffer)
     }
 
     isThreadWriting = false;
+
+    ReleaseMutex(mutex);
 }

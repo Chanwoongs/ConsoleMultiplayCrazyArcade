@@ -393,10 +393,18 @@ void GameServer::SynchronizeGameState()
 {
     if (gameLevel == nullptr) return;
 
+    isSynchronizing = true;
+
+    WaitForSingleObject(mutex, INFINITE);
+
     char buffer[packetBufferSize] = {};
     size_t gameStateSize = 0;
 
     gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
+
+    GameLevel* g = new GameLevel();
+
+    g->DeserializeGameState(buffer);
 
     GameStateSynchronizePacket* gameStatePacket = new GameStateSynchronizePacket(gameStateSize, buffer);
 
@@ -406,6 +414,9 @@ void GameServer::SynchronizeGameState()
     EnqueueBroadcast(serializedSize, serializedData);
 
     delete gameStatePacket;
+
+    ReleaseMutex(mutex);
+    isSynchronizing = false;
 }
 
 void GameServer::ErrorHandling(const char* message) const

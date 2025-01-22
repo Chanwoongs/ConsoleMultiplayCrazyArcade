@@ -8,6 +8,7 @@
 #define TEST 1
 
 unsigned WINAPI AcceptClientsThread(void* arg);
+unsigned WINAPI SynchronizeGameStateThread(void* arg);
 
 int main(int argc, char* argv[])
 {
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
         GameServer* server = new GameServer(argv[1]);
 #endif
         HANDLE acceptThread = (HANDLE)_beginthreadex(NULL, 0, AcceptClientsThread, server, 0, NULL);
+        HANDLE syncThread = (HANDLE)_beginthreadex(NULL, 0, SynchronizeGameStateThread, server, 0, NULL);  
 
         Engine* engine = new Engine();
 
@@ -41,6 +43,8 @@ int main(int argc, char* argv[])
         }
 
         WaitForSingleObject(acceptThread, INFINITE);
+        WaitForSingleObject(syncThread, INFINITE);  
+
         CloseHandle(acceptThread);
         delete engine;
         delete server;
@@ -65,6 +69,17 @@ unsigned WINAPI AcceptClientsThread(void* arg)
     catch (const std::exception& ex)
     {
         fprintf(stderr, "Exception in AcceptClientsThread: %s\n", ex.what());
+    }
+    return 0;
+}
+
+unsigned WINAPI SynchronizeGameStateThread(void* arg)
+{
+    GameServer* server = static_cast<GameServer*>(arg);
+    while (server->IsRunning())
+    {
+        server->SynchronizeGameState();
+        Sleep(100);
     }
     return 0;
 }

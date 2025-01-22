@@ -43,6 +43,7 @@ public:
 
 	static unsigned WINAPI HandleClient(void* arg);
     static unsigned WINAPI Send(void* arg);
+    static unsigned WINAPI SynchronizeGameStateThread(void* arg);
 
     void ProcessPacket(SOCKET clientSocket, char* packet);
 	void Send(SendTask* task);
@@ -78,6 +79,7 @@ private:
 
     bool isRunning = false;
     bool isMapInitialzed = false;
+    bool isSynchronizing;
 
     class GameLevel* gameLevel = nullptr;
 
