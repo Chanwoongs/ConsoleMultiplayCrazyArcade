@@ -23,6 +23,8 @@ public:
 
     bool CanPlayerMove(const class Vector2& position);
 
+	inline void SetClientId(int id) { clientId = id; }
+
     void MovePlayer(int playerId, enum class Direction direction);
     
 private:
@@ -47,4 +49,6 @@ private:
     bool isThreadWriting = false;
 
     HANDLE mutex = 0;
+
+    int clientId = 0;
 };

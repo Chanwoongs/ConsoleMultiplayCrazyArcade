@@ -27,6 +27,8 @@ public:
     virtual void SetPosition(const Vector2& newPosition) override;
     void SetImage(const char* newImage);
 
+	inline void SetColor(Color newColor) { color = newColor; }
+
     // 충돌 확인 함수
     bool Intersect(const DrawableActor& other);
 

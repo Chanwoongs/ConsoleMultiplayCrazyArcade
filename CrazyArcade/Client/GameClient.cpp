@@ -175,9 +175,9 @@ void GameClient::ProcessPacket(char* packet, int size)
 
         WaitForSingleObject(hReceiveMutex, INFINITE);
         Game::Get().LoadLevel(new GameLevel);
-
+        
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
-
+		currentLevel->SetClientId(playerId);
         currentLevel->DeserializeGameState(playerEnterRespondPacket.gameStateBuffer);
         ReleaseMutex(hReceiveMutex);
 

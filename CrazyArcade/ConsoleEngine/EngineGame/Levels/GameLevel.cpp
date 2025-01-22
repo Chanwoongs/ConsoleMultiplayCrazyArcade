@@ -132,11 +132,20 @@ void GameLevel::Draw()
     // 플레이어 그리기
     if (players.size() > 0)
     {
-        for (auto* player : players)
+        for (int i = 0; i < players.size(); ++i)
         {
-            if (player != nullptr)
+            if (players[i] != nullptr)
             {
-                player->Draw();
+				if (i == clientId - 1)
+				{
+					players[i]->SetColor(Color::Blue);
+				}
+				else
+				{
+					players[i]->SetColor(Color::Red);
+				}
+
+                players[i]->Draw();
             }
         }
     }

@@ -81,11 +81,8 @@ void DrawableActor::Draw()
     Engine::Get().SetCursorPosition(position);
 
     // 2단계: 그리기 (콘솔 출력)
-    //Log("%s", image);
-    std::cout << image;
-
-    // 색상 설정
-    SetColor(Color::White);
+    Log(image);
+    //std::cout << image;
 
     Engine::Get().SetCursorPosition(Vector2(0, 0));
 }

@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Math/Vector2.h"
+#include <random>
 
 class Level;
 class Actor;
@@ -46,6 +47,14 @@ public:
 
     // 화면 크기 반환 함수
     inline Vector2 ScreenSize() const { return screenSize; }
+	
+	int GetRandomInt(int min, int max)
+	{
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		std::uniform_int_distribution<int> dist(min, max);
+		return dist(gen);
+	}
 
     // 타겟 프레임 속도 설정 함수
     void SetTargetFrameRate(float targetFrameRate);

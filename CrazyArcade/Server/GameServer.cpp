@@ -285,9 +285,11 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         WaitForSingleObject(mutex, INFINITE);
 
-        gameLevel->AddActor(new Player(++playerCount, Vector2(playerCount, playerCount), gameLevel));
-        gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
+        int y = Engine::Get().GetRandomInt(3, 15);
+        int x = Engine::Get().GetRandomInt(10, 60);
 
+        gameLevel->AddActor(new Player(++playerCount, Vector2(x, y), gameLevel));
+        gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
 
         if (_heapchk() != _HEAPOK)
         {
@@ -295,7 +297,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         }
 
         PlayerEnterRespondPacket* playerEnterRespondPacket =
-            new PlayerEnterRespondPacket(playerCount, playerCount + 1, playerCount + 1, buffer, gameStateSize);
+            new PlayerEnterRespondPacket(playerCount, y, x, buffer, gameStateSize);
 
         ReleaseMutex(mutex);
 
