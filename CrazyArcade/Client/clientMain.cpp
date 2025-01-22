@@ -29,11 +29,7 @@ int main(int argc, char* argv[])
     client->RunThreads();
 
     system("cls");
-    game->Run();
-
-    //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
-    //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
-    //client->AddPacketToSendQueue(packetData);        
+    game->Run(); 
 
     delete game;
     delete client;
