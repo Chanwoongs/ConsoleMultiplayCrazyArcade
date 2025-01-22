@@ -209,6 +209,13 @@ void GameLevel::MovePlayer(int playerId, Direction direction)
     ReleaseMutex(mutex);
 }
 
+void GameLevel::RemovePlayer(int playerId)
+{
+	WaitForSingleObject(mutex, INFINITE);
+	players.erase(players.begin() + playerId - 1);
+	ReleaseMutex(mutex);
+}
+
 bool GameLevel::CheckGameClear()
 {
     return false;

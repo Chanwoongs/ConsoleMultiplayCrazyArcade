@@ -26,6 +26,7 @@ public:
 	inline void SetClientId(int id) { clientId = id; }
 
     void MovePlayer(int playerId, enum class Direction direction);
+	void RemovePlayer(int playerId);
     
 private:
     bool CheckGameClear();

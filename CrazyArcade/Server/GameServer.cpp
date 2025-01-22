@@ -339,6 +339,18 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         {
             gameLevel->MovePlayer(inputPacket->playerId, Direction::LEFT);
         }
+
+        delete inputPacket;
+    }
+    else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_EXIT_REQUEST)
+    {
+		PlayerExitRequestPacket* playerExitRequestPacket = (PlayerExitRequestPacket*)packet;
+
+		WaitForSingleObject(mutex, INFINITE);
+		gameLevel->RemovePlayer(playerExitRequestPacket->playerId);
+		ReleaseMutex(mutex);
+
+		delete playerExitRequestPacket;
     }
 
     delete[] packet;

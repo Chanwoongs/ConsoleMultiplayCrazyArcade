@@ -30,6 +30,8 @@ public:
     void EnqueueSend(ClientPacketData* data);
     void ProcessPacket(char* packet, int size);
 
+    void RequestExitGame();
+
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
     inline std::queue<ClientPacketData*>& GetSendQueue() { return sendQueue; }

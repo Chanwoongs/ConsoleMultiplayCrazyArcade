@@ -11,6 +11,7 @@ enum class ENGINE_API PacketType
     INPUT = 1,
     MOVE,
     PLAYER_ENTER_REQUEST,
+    PLAYER_EXIT_REQUEST,
     PLAYER_ENTER_RESPOND,
     GAME_STATE_SYNCHRONIZE
 };
@@ -32,6 +33,21 @@ public:
     {
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_REQUEST;
         header.packetSize = sizeof(PlayerEnterRequestPacket);
+    }
+};
+
+struct ENGINE_API PlayerExitRequestPacket
+{
+public:
+    PacketHeader header;
+	uint32_t playerId;
+
+public:
+    PlayerExitRequestPacket(uint32_t playerId)
+		: playerId(playerId)
+    {
+        header.packetType = (uint32_t)PacketType::PLAYER_EXIT_REQUEST;
+        header.packetSize = sizeof(PlayerExitRequestPacket);
     }
 };
 

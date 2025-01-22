@@ -197,6 +197,20 @@ void GameClient::ProcessPacket(char* packet, int size)
     }
 }
 
+void GameClient::RequestExitGame()
+{
+    PlayerExitRequestPacket* playerExitequestPacket = new PlayerExitRequestPacket(playerId);
+
+    GameClient::Get().EnqueueSend(
+        GameClient::Get().CreatePacketData(
+            PacketType(playerExitequestPacket->header.packetType),
+            sizeof(PlayerExitRequestPacket),
+            (char*)playerExitequestPacket)
+    );
+
+    delete playerExitequestPacket;
+}
+
 void GameClient::ErrorHandling(const char* message)
 {
     fputs(message, stderr);
