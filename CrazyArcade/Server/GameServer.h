@@ -32,6 +32,7 @@ class GameServer
         }
     };
 
+public:
     struct SendTask
     {
         enum class Type
@@ -59,8 +60,10 @@ public:
 	void Send(SendTask* task);
 	void Broadcast(SendTask* task);
 
-    void EnqueueSend(SOCKET clientSocket, size_t packetSize, char* packet);
-    void EnqueueBroadcast(SOCKET clientSocket, size_t packetSize, char* packet);
+    void EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket);
+    void EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket = 0);
+
+    void SynchronizeGameState();
 
     inline class GameLevel* GetGameLevel() { return gameLevel; }
     inline bool IsRunning() const { return isRunning; }
@@ -89,5 +92,5 @@ private:
 
     class GameLevel* gameLevel = nullptr;
 
-    static constexpr int packetBufferSize = 2048;
+    static constexpr int packetBufferSize = 8192;
 };

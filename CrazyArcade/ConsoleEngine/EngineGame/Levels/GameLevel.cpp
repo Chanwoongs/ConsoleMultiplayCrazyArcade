@@ -22,6 +22,13 @@ GameLevel::GameLevel()
 
 GameLevel::~GameLevel()
 {
+    delete map;
+
+    for (auto& player : players)
+    {
+        delete player;
+    }
+
     for (auto& pos : wallPositions)
     {
         delete pos;
@@ -30,7 +37,7 @@ GameLevel::~GameLevel()
 
 void GameLevel::AddActor(Actor* newActor)
 {
-    Super::AddActor(newActor);
+    //Super::AddActor(newActor);
 
     if (newActor->As<Player>())
     {
@@ -64,6 +71,14 @@ void GameLevel::Update(float deltaTime)
 
         // 게임 종료 처리
         Engine::Get().QuitGame();
+    }
+
+    if (players.size() > 0)
+    {
+        for (auto& player : players)
+        {
+            player->Update(deltaTime);
+        }
     }
 }
 

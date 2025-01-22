@@ -307,10 +307,13 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         //p->Deserialize(serializedData, serializedSize);
 
         // EnqueueSend 호출
-        EnqueueSend(clientSocket, serializedSize, serializedData);
+        EnqueueSend(serializedSize, serializedData, clientSocket);
+
+        delete playerEnterRespondPacket;
 
         break;
     }
+    delete[] packet;
 }
 
 void GameServer::Send(SendTask* task)
@@ -340,7 +343,7 @@ void GameServer::Broadcast(SendTask* task)
     ReleaseMutex(mutex);
 }
 
-void GameServer::EnqueueSend(SOCKET clientSocket, size_t packetSize, char* packet)
+void GameServer::EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
@@ -350,7 +353,7 @@ void GameServer::EnqueueSend(SOCKET clientSocket, size_t packetSize, char* packe
     ReleaseMutex(sendMutex);
 }
 
-void GameServer::EnqueueBroadcast(SOCKET clientSocket, size_t packetSize, char* packet)
+void GameServer::EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
@@ -358,6 +361,25 @@ void GameServer::EnqueueBroadcast(SOCKET clientSocket, size_t packetSize, char* 
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);
+}
+
+void GameServer::SynchronizeGameState()
+{
+    if (gameLevel == nullptr) return;
+
+    char buffer[packetBufferSize] = {};
+    size_t gameStateSize = 0;
+
+    gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
+
+    GameStateSynchronizePacket* gameStatePacket = new GameStateSynchronizePacket(gameStateSize, buffer);
+
+    size_t serializedSize = 0;
+    char* serializedData = gameStatePacket->Serialize(serializedSize);
+
+    EnqueueBroadcast(serializedSize, serializedData);
+
+    delete gameStatePacket;
 }
 
 void GameServer::ErrorHandling(const char* message) const

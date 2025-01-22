@@ -63,4 +63,6 @@ void Game::RequestEnterGame()
 void Game::EnterGame()
 {
     system("cls");
+
+    GameClient::Get().EnterGame();
 }

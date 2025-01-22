@@ -53,6 +53,7 @@ public:
     inline bool IsGameover() const { return isGameover; }
     inline std::queue<PacketData*>& GetSendQueue() { return sendQueue; }
     inline int PlayerId() const{ return playerId; }
+    inline void EnterGame() { hasEnteredGame = true; }
 
     void ErrorHandling(const char* message);
 
@@ -70,6 +71,7 @@ private:
 
     int playerId = 0;
     bool isGameover = false;
+    bool hasEnteredGame = false;
 
-    static constexpr int packetBufferSize = 2048;
+    static constexpr int packetBufferSize = 8192;
 };

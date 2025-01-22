@@ -6,19 +6,13 @@
 #include "EngineGame/Levels/GameLevel.h"
 #include <new.h>
 
-static void __cdecl NewExceptionHandler()
-{
-    OutputDebugStringA("Failed to allocate memory\n");
-    ExitProcess(false);
-    return;
-}
-
 enum class ENGINE_API PacketType
 {
     INPUT = 1,
     MOVE,
     PLAYER_ENTER_REQUEST,
     PLAYER_ENTER_RESPOND,
+    GAME_STATE_SYNCHRONIZE
 };
 
 struct ENGINE_API PacketHeader 
@@ -57,19 +51,11 @@ public:
         const char* gameStateData, size_t gameStateSize)
         : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr), gameStateSize((uint32_t)gameStateSize)
     {
-        set_new_handler(NewExceptionHandler);
-        
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_RESPOND;
         header.packetSize = sizeof(PlayerEnterRespondPacket);
 
         gameStateBuffer = new char[gameStateSize];
-         memcpy(gameStateBuffer, gameStateData, gameStateSize);
-
-        //error = _heapchk();
-        //if (error != _HEAPOK)
-        //{
-        //    DebugBreak();
-        //}
+        memcpy(gameStateBuffer, gameStateData, gameStateSize);
 
         header.packetSize += (uint32_t)gameStateSize;
     }
@@ -135,6 +121,70 @@ public:
         offset += sizeof(gameStateSize);
 
         delete[] gameStateBuffer; 
+        gameStateBuffer = new char[gameStateSize];
+        memset(gameStateBuffer, 0, gameStateSize);
+        memcpy(gameStateBuffer, buffer + offset, gameStateSize);
+    }
+};
+
+struct ENGINE_API GameStateSynchronizePacket
+{
+public:
+    PacketHeader header;
+    uint32_t gameStateSize;
+    char* gameStateBuffer;
+
+    GameStateSynchronizePacket(size_t gameStateSize, char* gameStateData)
+        : gameStateBuffer(gameStateData), gameStateSize(gameStateSize)
+    {
+        header.packetType = (uint32_t)PacketType::GAME_STATE_SYNCHRONIZE;
+        header.packetSize = sizeof(GameStateSynchronizePacket);
+
+        gameStateBuffer = new char[gameStateSize];
+        memcpy(gameStateBuffer, gameStateData, gameStateSize);
+
+        header.packetSize += (uint32_t)gameStateSize;
+    }
+    ~GameStateSynchronizePacket()
+    {
+        delete[] gameStateBuffer;
+    }
+
+    char* Serialize(size_t& size)
+    {
+        size_t totalPacketSize = sizeof(PacketHeader) +
+            sizeof(gameStateSize) +
+            gameStateSize;
+
+        char* sendBuffer = new char[totalPacketSize];
+
+        size_t offset = 0;
+
+        memcpy(sendBuffer + offset, &header, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(sendBuffer + offset, &gameStateSize, sizeof(gameStateSize));
+        offset += sizeof(gameStateSize);
+
+        memcpy(sendBuffer + offset, gameStateBuffer, gameStateSize);
+        offset += gameStateSize;
+
+        size = offset;
+
+        return sendBuffer;
+    }
+
+    void Deserialize(const char* buffer, size_t size)
+    {
+        size_t offset = 0;
+
+        memcpy(&header, buffer + offset, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(&gameStateSize, buffer + offset, sizeof(gameStateSize));
+        offset += sizeof(gameStateSize);
+
+        delete[] gameStateBuffer;
         gameStateBuffer = new char[gameStateSize];
         memset(gameStateBuffer, 0, gameStateSize);
         memcpy(gameStateBuffer, buffer + offset, gameStateSize);

@@ -159,23 +159,31 @@ void GameClient::ProcessPacket(char* packet, int size)
 {
     PacketHeader* packetHeader = (PacketHeader*)packet;
 
-    switch ((PacketType)packetHeader->packetType)
+    if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_RESPOND)
     {
-    case PacketType::PLAYER_ENTER_RESPOND:
-        PlayerEnterRespondPacket receivedPacket(0, 0, 0, nullptr, 0);
-        receivedPacket.Deserialize(packet, size);
+        PlayerEnterRespondPacket playerEnterRespondPacket(0, 0, 0, nullptr, 0);
+        playerEnterRespondPacket.Deserialize(packet, size);
 
-        playerId = receivedPacket.playerId;
+        playerId = playerEnterRespondPacket.playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
 
         Game::Get().LoadLevel(new GameLevel);
 
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
-        currentLevel->DeserializeGameState(receivedPacket.gameStateBuffer);
+        currentLevel->DeserializeGameState(playerEnterRespondPacket.gameStateBuffer);
 
         Game::Get().EnterGame();
-        break;
+    }
+    else if ((PacketType)packetHeader->packetType == PacketType::GAME_STATE_SYNCHRONIZE)
+    {
+        if (!hasEnteredGame) return;
+
+        GameStateSynchronizePacket gameStateSynchronizePacket(0, nullptr);
+        gameStateSynchronizePacket.Deserialize(packet, size);
+
+        GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
+        currentLevel->DeserializeGameState(gameStateSynchronizePacket.gameStateBuffer);
     }
 }
 

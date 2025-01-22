@@ -37,6 +37,9 @@ int main(int argc, char* argv[])
         while (server->IsRunning())
         {
             // 게임 로직
+            server->SynchronizeGameState();
+
+            Sleep(100);
         }
 
         WaitForSingleObject(acceptThread, INFINITE);

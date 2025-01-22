@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[])
 {
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    CheckMemoryLeak();
 
 #if !TEST
     if (argc != 3)
@@ -28,16 +28,12 @@ int main(int argc, char* argv[])
 
     client->RunThreads();
 
-    while (true)
-    {
-        system("cls");
-        game->Run();
+    system("cls");
+    game->Run();
 
-        //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
-        //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
-        //client->AddPacketToSendQueue(packetData);
-        
-    }
+    //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
+    //PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
+    //client->AddPacketToSendQueue(packetData);        
 
     delete game;
     delete client;
