@@ -180,6 +180,9 @@ void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outS
     map->Serialize(buffer + offset, mapSize);
     offset += mapSize;
 
+    //size_t size = 0;
+    //map->Deserialize(buffer, size);
+
     outSize = offset;
 }
 

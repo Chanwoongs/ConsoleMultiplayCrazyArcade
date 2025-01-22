@@ -114,7 +114,7 @@ unsigned WINAPI GameClient::Send(void* arg)
             PacketType type = packetData->type;
             char* packet = packetData->packet;
             
-            char buffer[maxBufferSize] = {};
+            char buffer[packetBufferSize] = {};
             SerializePacket(packet, packetData->size, buffer);
             send(hSocket, buffer, packetData->size, 0);
 
@@ -133,12 +133,12 @@ unsigned WINAPI GameClient::Receive(void* arg)
 {
     GameClient* client = static_cast<GameClient*>(arg);
     SOCKET hSocket = client->Socket();
-    char buffer[maxBufferSize] = {};
+    char buffer[packetBufferSize] = {};
     int strLen;
 
     while (!client->IsGameover())
     {
-        strLen = recv(hSocket, buffer, maxBufferSize, 0);
+        strLen = recv(hSocket, buffer, packetBufferSize, 0);
 
         if (strLen > 0)
         {

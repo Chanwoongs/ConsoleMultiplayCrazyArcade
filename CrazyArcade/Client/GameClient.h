@@ -71,6 +71,5 @@ private:
     int playerId = 0;
     bool isGameover = false;
 
-    static constexpr int maxBufferSize = 1024;
-    static constexpr int gameStateBufferSize = 2048;
+    static constexpr int packetBufferSize = 2048;
 };

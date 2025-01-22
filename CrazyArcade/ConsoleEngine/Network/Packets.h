@@ -61,20 +61,9 @@ public:
         
         header.packetType = (uint32_t)PacketType::PLAYER_ENTER_RESPOND;
         header.packetSize = sizeof(PlayerEnterRespondPacket);
-        try
-        {
-            auto test = new char[100];
-            gameStateBuffer = new char[gameStateSize + 1];
-        }
-        catch (const std::exception& ex)
-        {
-            __debugbreak();
-            return;
-        }
 
-        gameStateBuffer[gameStateSize] = '\0';
-        memcpy(gameStateBuffer, gameStateData, gameStateSize);
-        
+        gameStateBuffer = new char[gameStateSize];
+         memcpy(gameStateBuffer, gameStateData, gameStateSize);
 
         //error = _heapchk();
         //if (error != _HEAPOK)
@@ -147,6 +136,7 @@ public:
 
         delete[] gameStateBuffer; 
         gameStateBuffer = new char[gameStateSize];
+        memset(gameStateBuffer, 0, gameStateSize);
         memcpy(gameStateBuffer, buffer + offset, gameStateSize);
     }
 };

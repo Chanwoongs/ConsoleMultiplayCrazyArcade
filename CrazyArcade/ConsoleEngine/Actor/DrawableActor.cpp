@@ -54,6 +54,7 @@ void DrawableActor::Deserialize(const char* buffer, size_t& size)
 
     delete[] image; 
     image = new char[imageLength];
+    memset(image, 0, imageLength);
     memcpy(image, buffer + offset, imageLength);
     offset += imageLength;
 

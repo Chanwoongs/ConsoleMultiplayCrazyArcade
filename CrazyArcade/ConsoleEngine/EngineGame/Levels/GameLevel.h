@@ -30,6 +30,6 @@ private:
     std::vector<class Player*> players;
 
     std::vector<class Vector2*> wallPositions;
-
+     
     bool isGameClear = false;
 };

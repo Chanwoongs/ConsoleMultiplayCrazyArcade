@@ -295,8 +295,11 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         size_t serializedSize;
         char* serializedData = playerEnterRespondPacket->Serialize(serializedSize);
 
+        //PlayerEnterRespondPacket* p = new PlayerEnterRespondPacket(0, 0, 0, 0, 0);
+        //p->Deserialize(serializedData, serializedSize);
+
         // EnqueueSend 호출
-        EnqueueSend(clientSocket, serializedSize,(char*)serializedData);
+        EnqueueSend(clientSocket, serializedSize, serializedData);
 
         break;
     }
