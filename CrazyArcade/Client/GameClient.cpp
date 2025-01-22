@@ -47,13 +47,17 @@ GameClient::~GameClient()
     WSACleanup();
 
     CloseHandle(hSendMutex);
-    CloseHandle(hSendThread);
-    CloseHandle(hReceiveThread);
 
     if (serverAddress)
     {
         delete serverAddress;
     }
+
+    WaitForSingleObject(hSendThread, INFINITE);
+    WaitForSingleObject(hReceiveThread, INFINITE);
+
+    CloseHandle(hSendThread);
+    CloseHandle(hReceiveThread);
 }
 
 ClientPacketData* GameClient::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)

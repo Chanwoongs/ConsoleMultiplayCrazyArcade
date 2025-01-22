@@ -122,6 +122,7 @@ void Engine::Run()
             // 업데이트 가능한 상태에서만 프레임 업데이트 처리
             if (shouldUpdate)
             {
+                CheckInput();
                 Update(deltaTime);
                 Draw();
             }
@@ -254,6 +255,14 @@ void Engine::ProcessInput()
 		// (GetAsyncKeyState(i) & 0x8000) 현재 프레임에 눌렸는지 저장
 		keyState[i].isKeyDown = (GetAsyncKeyState(i) & 0x8000) ? true : false;
 	}
+}
+
+void Engine::CheckInput()
+{
+    if (Engine::Get().GetKeyDown(VK_ESCAPE))
+    {
+        Engine::Get().QuitGame();
+    }
 }
 
 void Engine::Update(float deltaTime)

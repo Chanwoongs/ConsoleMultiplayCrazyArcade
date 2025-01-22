@@ -64,6 +64,7 @@ public:
 //protected:
 public:
 	void ProcessInput();				// 입력
+    virtual void CheckInput();
 	void Update(float deltaTime);		// Tick
 
     void Clear();                       // 화면 지우기.

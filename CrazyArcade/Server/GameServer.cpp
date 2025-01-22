@@ -1,7 +1,7 @@
 ﻿#include "GameServer.h"
 
 #include "Engine/Engine.h"
-#include "EngineGame/Levels/GameLevel.h"
+#include "EngineGame/Levels/GameLevel.h" 
 #include "EngineGame/Actors/Player.h"
 
 GameServer::GameServer(const char* port)
@@ -56,17 +56,25 @@ GameServer::~GameServer()
 
     WaitForMultipleObjects((DWORD)clientThreads.size(), clientThreads.data(), TRUE, INFINITE);
 
-    for (auto& thread : clientThreads)
-    {
-        CloseHandle(thread);
-    }
-    CloseHandle(sendThread);
+
     CloseHandle(mutex);
 
     if (serverAddress)
     {
         delete serverAddress;
     }
+
+    for (auto& thread : clientThreads)
+    {
+        WaitForSingleObject(thread, INFINITE);
+    }
+    WaitForSingleObject(sendThread, INFINITE);
+    
+    for (auto& thread : clientThreads)
+    {
+        CloseHandle(thread);
+    }
+    CloseHandle(sendThread);
 }
 
 void GameServer::AcceptClients()
@@ -171,14 +179,13 @@ unsigned WINAPI GameServer::HandleClient(void* arg)
             DebugBreak();
         }
 
-        //DeserializePacket(packet, strlen(packet), buffer);
-        DeserializePacket(packet, strlen(buffer), buffer);
+        DeserializePacket(packet, strLen, buffer);
 
         if (_heapchk() != _HEAPOK)
         {
             DebugBreak();
         }
-        
+
         server->ProcessPacket(hClientSocket, packet);
 
         strLen = 0;
@@ -260,12 +267,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 {
     PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packet);
 
-    switch ((PacketType)packetHeader->packetType)
+    if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_REQUEST)
     {
-    case PacketType::MOVE:
-        break;
-    case PacketType::PLAYER_ENTER_REQUEST:
-
         if (_heapchk() != _HEAPOK)
         {
             DebugBreak();
@@ -311,9 +314,31 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         EnqueueSend(serializedSize, serializedData, clientSocket);
 
         delete playerEnterRespondPacket;
-
-        break;
     }
+    else if ((PacketType)packetHeader->packetType == PacketType::INPUT)
+    {
+        InputPacket* inputPacket = new InputPacket(0, 0);
+        size_t size = 0;
+        inputPacket->Deserialize(packet, size);
+        
+        if (inputPacket->keyCode == VK_UP)
+        {    
+            gameLevel->MovePlayer(inputPacket->playerId, Direction::UP);
+        }
+        else if (inputPacket->keyCode == VK_DOWN)
+        {
+            gameLevel->MovePlayer(inputPacket->playerId, Direction::DOWN);
+        }
+        else if (inputPacket->keyCode == VK_RIGHT)
+        {
+            gameLevel->MovePlayer(inputPacket->playerId, Direction::RIGHT);
+        }
+        else if (inputPacket->keyCode == VK_LEFT)
+        {
+            gameLevel->MovePlayer(inputPacket->playerId, Direction::LEFT);
+        }
+    }
+
     delete[] packet;
 }
 

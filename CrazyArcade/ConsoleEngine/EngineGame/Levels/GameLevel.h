@@ -2,6 +2,8 @@
 
 #include "Level/Level.h"
 
+#include <queue>
+
 class ENGINE_API GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)
@@ -21,6 +23,8 @@ public:
 
     bool CanPlayerMove(const class Vector2& position);
 
+    void MovePlayer(int playerId, enum class Direction direction);
+    
 private:
     bool CheckGameClear();
 
@@ -41,4 +45,8 @@ private:
     std::vector<class Player*> tempPlayers;
 
     bool isThreadWriting = false;
+
+    std::queue<std::pair<int, Direction>> moveQueue;
+
+    HANDLE mutex = 0;
 };

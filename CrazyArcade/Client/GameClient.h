@@ -35,6 +35,7 @@ public:
     inline std::queue<ClientPacketData*>& GetSendQueue() { return sendQueue; }
     inline int PlayerId() const{ return playerId; }
     inline void EnterGame() { hasEnteredGame = true; }
+    inline bool HasEnteredGame() const { return hasEnteredGame; }
 
     void ErrorHandling(const char* message);
 

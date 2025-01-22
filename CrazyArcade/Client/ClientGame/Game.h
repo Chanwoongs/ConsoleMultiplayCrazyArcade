@@ -12,6 +12,8 @@ public:
     void RequestEnterGame();
     void EnterGame();
 
+    virtual void CheckInput() override;
+
     inline Level* GetCurrentLevel() { return mainLevel; }
 
 	static Game& Get() { return *instance; }
@@ -24,4 +26,6 @@ private:
 
 private:
 	static Game* instance;
+
+    static constexpr int packetBufferSize = 8192;
 };

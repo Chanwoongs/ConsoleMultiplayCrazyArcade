@@ -196,7 +196,7 @@ struct ENGINE_API InputPacket
 public:
     PacketHeader header;
     uint32_t playerId;
-    uint8_t keyCode;
+    uint32_t keyCode;
 
 public:
     InputPacket(const uint32_t& playerId, const uint8_t& keyCode)
@@ -204,6 +204,44 @@ public:
     {
         header.packetType = (uint32_t)PacketType::INPUT;
         header.packetSize = sizeof(InputPacket);        
+    }
+
+    char* Serialize(size_t& size)
+    {
+        size_t totalPacketSize = sizeof(PacketHeader) +
+            sizeof(playerId) +
+            sizeof(keyCode);
+
+        char* sendBuffer = new char[totalPacketSize];
+
+        size_t offset = 0;
+
+        memcpy(sendBuffer + offset, &header, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(sendBuffer + offset, &playerId, sizeof(playerId));
+        offset += sizeof(playerId);
+
+        memcpy(sendBuffer + offset, &keyCode, sizeof(keyCode));
+        offset += sizeof(keyCode);
+
+        size = offset;
+
+        return sendBuffer;
+    }
+
+    void Deserialize(const char* buffer, size_t size)
+    {
+        size_t offset = 0;
+
+        memcpy(&header, buffer + offset, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(&playerId, buffer + offset, sizeof(playerId));
+        offset += sizeof(playerId);
+
+        memcpy(&keyCode, buffer + offset, sizeof(keyCode));
+        offset += sizeof(keyCode);
     }
 };
 

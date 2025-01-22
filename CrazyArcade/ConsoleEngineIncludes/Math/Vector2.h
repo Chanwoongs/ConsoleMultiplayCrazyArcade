@@ -2,6 +2,14 @@
 
 #include "Core.h"
 
+enum class ENGINE_API Direction
+{
+    UP,
+    DOWN,
+    RIGHT,
+    LEFT
+};
+
 class ENGINE_API Vector2
 {
 public:

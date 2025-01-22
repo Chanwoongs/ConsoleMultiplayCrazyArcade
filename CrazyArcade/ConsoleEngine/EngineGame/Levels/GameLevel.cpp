@@ -10,6 +10,8 @@
 #include "EngineGame/Actors/Wall.h"
 #include "EngineGame/Actors/Player.h"
 
+#include "Network/Packets.h"
+
 GameLevel::GameLevel()
 {
     system("cls");
@@ -113,11 +115,7 @@ void GameLevel::Update(float deltaTime)
             map = tempMap;
             tempMap = nullptr;
         }
-    }
-
-        //InputPacket* inputPacket = new InputPacket(1, VK_RETURN);
-//PacketData* packetData = new PacketData(client, PacketType(inputPacket->header.packetType), (void*)inputPacket);
-//client->AddPacketToSendQueue(packetData);     
+    }   
 }
 
 void GameLevel::Draw()
@@ -162,6 +160,69 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
     }
 
     return false;
+}
+
+void GameLevel::MovePlayer(int playerId, Direction direction)
+{
+    //moveQueue.push(std::make_pair(playerId, direction));
+
+    //if (!moveQueue.empty())
+    //{
+    //    auto move = moveQueue.front();
+    //    moveQueue.pop();
+
+    //    Vector2 position = players[move.first]->Position();
+
+    //    switch (move.second)
+    //    {
+    //    case Direction::UP:
+    //        --position.y;
+    //        break;
+    //    case Direction::DOWN:
+    //        ++position.y;
+    //        break;
+    //    case Direction::RIGHT:
+    //        ++position.x;
+    //        break;
+    //    case Direction::LEFT:
+    //        --position.x;
+    //        break;
+    //    }
+
+    //    players[move.first]->SetPosition(position);
+    //}
+
+    if (playerId <= 0) return;
+
+    WaitForSingleObject(mutex, INFINITE);
+
+    if (playerId > players.size())
+    {
+        ReleaseMutex(mutex);
+        return;
+    }
+
+    Vector2 position = players[playerId - 1]->Position();
+
+    switch (direction)
+    {
+    case Direction::UP:
+        --position.y;
+        break;
+    case Direction::DOWN:
+        ++position.y;
+        break;
+    case Direction::RIGHT:
+        ++position.x;
+        break;
+    case Direction::LEFT:
+        --position.x;
+        break;
+    }
+
+    players[playerId - 1]->SetPosition(position);
+
+    ReleaseMutex(mutex);
 }
 
 bool GameLevel::CheckGameClear()
@@ -245,7 +306,6 @@ void GameLevel::LoadMap()
 void GameLevel::SerializeGameState(char* buffer, size_t bufferSize, size_t& outSize)
 {
     size_t offset = 0;
-
 
     size_t mapSize = 0;
     map->Serialize(buffer + offset, mapSize);

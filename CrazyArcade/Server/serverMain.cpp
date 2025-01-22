@@ -30,8 +30,6 @@ int main(int argc, char* argv[])
 #endif
         HANDLE acceptThread = (HANDLE)_beginthreadex(NULL, 0, AcceptClientsThread, server, 0, NULL);
 
-    /*    GameLevel* gameLevel = new GameLevel;
-        gameLevel->LoadMap();*/
         Engine* engine = new Engine();
 
         while (server->IsRunning())
