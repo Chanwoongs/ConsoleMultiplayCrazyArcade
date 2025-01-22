@@ -236,11 +236,11 @@ unsigned WINAPI GameServer::Send(void* arg)
 
             if (task->type == SendTask::Type::SEND)
             {
-                server->Send(task->clientSocket, task->packet);
+                server->Send(task);
             }
             else if (task->type == SendTask::Type::BROADCAST)
             {
-                server->Broadcast(task->packet);
+                server->Broadcast(task);
             }
             delete task->packet;
             delete task;
@@ -269,7 +269,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         }
 
         //@TODO: 랜덤 위치 생성 로직 
-        char buffer[gameStateBufferSize] = {};
+        char buffer[packetBufferSize] = {};
         size_t gameStateSize = 0;
 
         if (_heapchk() != _HEAPOK)
@@ -277,7 +277,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             DebugBreak();
         }
 
-        gameLevel->SerializeGameState(buffer, gameStateBufferSize, gameStateSize);
+        gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
 
         if (_heapchk() != _HEAPOK)
         {
@@ -296,54 +296,54 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         char* serializedData = playerEnterRespondPacket->Serialize(serializedSize);
 
         // EnqueueSend 호출
-        EnqueueSend(clientSocket, (void*)serializedData);
+        EnqueueSend(clientSocket, serializedSize,(char*)serializedData);
 
         break;
     }
 }
 
-void GameServer::Send(SOCKET clientSocket, void* packet)
+void GameServer::Send(SendTask* task)
 {
     WaitForSingleObject(mutex, INFINITE);
 
     char buffer[packetBufferSize] = {};
-    SerializePacket(packet, sizeof(buffer), buffer);
+    SerializePacket(task->packet, task->size, buffer);
 
-    send(clientSocket, buffer, sizeof(buffer), 0);
+    send(task->clientSocket, buffer, task->size, 0);
 
     ReleaseMutex(mutex);
 }
 
-void GameServer::Broadcast(void* packet)
+void GameServer::Broadcast(SendTask* task)
 {
     WaitForSingleObject(mutex, INFINITE);
 
     char buffer[packetBufferSize] = {};
-    SerializePacket(packet, sizeof(buffer), buffer);
+    SerializePacket(task->packet, task->size, buffer);
 
     for (SOCKET client : clientSockets)
     {
-        send(client, buffer, sizeof(buffer), 0);
+        send(client, buffer, task->size, 0);
     }
 
     ReleaseMutex(mutex);
 }
 
-void GameServer::EnqueueSend(SOCKET clientSocket, void* packet)
+void GameServer::EnqueueSend(SOCKET clientSocket, size_t packetSize, char* packet)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ SendTask::Type::SEND, clientSocket, packet };
+    SendTask* task = new SendTask{ SendTask::Type::SEND, clientSocket, packetSize, packet};
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);
 }
 
-void GameServer::EnqueueBroadcast(SOCKET clientSocket, void* packet)
+void GameServer::EnqueueBroadcast(SOCKET clientSocket, size_t packetSize, char* packet)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ SendTask::Type::BROADCAST, clientSocket, packet };
+    SendTask* task = new SendTask{ SendTask::Type::BROADCAST, clientSocket, packetSize, packet };
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);

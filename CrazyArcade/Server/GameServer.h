@@ -22,11 +22,12 @@ class GameServer
 
     struct PacketData
     {
-        PacketType packetType;
-        void* packet;
+        PacketType type;
+        size_t size;
+        char* packet;
 
-        PacketData(const PacketType& packetType, void* packet)
-            : packetType(packetType), packet(packet)
+        PacketData(const PacketType& type, size_t size, char* packet)
+            : type(type), size(size), packet(packet)
         {
         }
     };
@@ -41,7 +42,8 @@ class GameServer
 
         Type type;
         SOCKET clientSocket;
-        void* packet;
+        size_t size;
+        char* packet;
     };
 
 public:
@@ -54,11 +56,11 @@ public:
     static unsigned WINAPI Send(void* arg);
 
     void ProcessPacket(SOCKET clientSocket, char* packet);
-	void Send(SOCKET clientSocket, void* packet);
-	void Broadcast(void* packet);
+	void Send(SendTask* task);
+	void Broadcast(SendTask* task);
 
-    void EnqueueSend(SOCKET clientSocket, void* packet);
-    void EnqueueBroadcast(SOCKET clientSocket, void* packet);
+    void EnqueueSend(SOCKET clientSocket, size_t packetSize, char* packet);
+    void EnqueueBroadcast(SOCKET clientSocket, size_t packetSize, char* packet);
 
     inline class GameLevel* GetGameLevel() { return gameLevel; }
     inline bool IsRunning() const { return isRunning; }
@@ -87,6 +89,5 @@ private:
 
     class GameLevel* gameLevel = nullptr;
 
-    static constexpr int packetBufferSize = 1024;
-    static constexpr int gameStateBufferSize = 2048;
+    static constexpr int packetBufferSize = 2048;
 };

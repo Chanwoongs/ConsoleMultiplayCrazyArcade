@@ -55,9 +55,9 @@ GameClient::~GameClient()
     }
 }
 
-GameClient::PacketData* GameClient::CreatePacketData(PacketType packetType, void* packet)
+GameClient::PacketData* GameClient::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
 {
-    return new GameClient::PacketData(this, packetType, packet);
+    return new GameClient::PacketData(this, packetType, packetSize, packet);
 }
 
 void GameClient::ConnectServer()
@@ -111,15 +111,14 @@ unsigned WINAPI GameClient::Send(void* arg)
         if (packetData)
         {
             SOCKET hSocket = client->Socket();
-            PacketType type = packetData->packetType;
-            void* packet = packetData->packet;
+            PacketType type = packetData->type;
+            char* packet = packetData->packet;
             
             char buffer[maxBufferSize] = {};
-            SerializePacket(packet, sizeof(packet), buffer);
-            send(hSocket, buffer, sizeof(buffer), 0);
+            SerializePacket(packet, packetData->size, buffer);
+            send(hSocket, buffer, packetData->size, 0);
 
             delete packet;
-            delete packetData;
         }
         else
         {

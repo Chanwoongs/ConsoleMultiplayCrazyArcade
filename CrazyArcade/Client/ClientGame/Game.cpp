@@ -55,7 +55,8 @@ void Game::RequestEnterGame()
     GameClient::Get().EnqueueSend(
         GameClient::Get().CreatePacketData(
             PacketType(playerEnterRequestPacket->header.packetType),
-            (void*)playerEnterRequestPacket)
+            sizeof(PlayerEnterRequestPacket),
+            (char*)playerEnterRequestPacket)
     );
 }
 

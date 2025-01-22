@@ -15,12 +15,19 @@ class GameClient
     struct PacketData
     {
         GameClient* client = nullptr;
-        PacketType packetType;
-        void* packet;
+        PacketType type;
+        size_t size;
+        char* packet;
 
-        PacketData(GameClient* client, PacketType packetType, void* packet)
-            : client(client), packetType(packetType), packet(packet)
+        PacketData(GameClient* client, PacketType type, size_t size, char* packet)
+            : client(client), type(type), size(size)
         {
+            this->packet = new char[size];
+            memcpy(this->packet, packet, size);
+        }
+        ~PacketData()
+        {
+            delete[] this->packet;
         }
     };
 
@@ -30,7 +37,7 @@ public:
     GameClient(const char* ip, const char* port);
     ~GameClient();
 
-    PacketData* CreatePacketData(PacketType packetType, void* packet);
+    PacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
 
     void ConnectServer();
     void RunThreads();

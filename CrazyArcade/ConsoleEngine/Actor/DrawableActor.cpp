@@ -45,7 +45,7 @@ void DrawableActor::Deserialize(const char* buffer, size_t& size)
     memcpy(&width, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
-    memcpy(&color, buffer + offset, sizeof(uint32_t));
+     memcpy(&color, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
     uint32_t imageLength = 0;
