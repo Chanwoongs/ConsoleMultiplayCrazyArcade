@@ -12,32 +12,13 @@
 
 class GameClient
 {
-    struct PacketData
-    {
-        GameClient* client = nullptr;
-        PacketType type;
-        size_t size;
-        char* packet;
-
-        PacketData(GameClient* client, PacketType type, size_t size, char* packet)
-            : client(client), type(type), size(size)
-        {
-            this->packet = new char[size];
-            memcpy(this->packet, packet, size);
-        }
-        ~PacketData()
-        {
-            delete[] this->packet;
-        }
-    };
-
 public:
     static GameClient& Get() { return *Instance; }
 
     GameClient(const char* ip, const char* port);
     ~GameClient();
 
-    PacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
+    ClientPacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
 
     void ConnectServer();
     void RunThreads();
@@ -46,12 +27,12 @@ public:
     static unsigned WINAPI Send(void* arg);
     static unsigned WINAPI Receive(void* arg);
 
-    void EnqueueSend(PacketData* data);
+    void EnqueueSend(ClientPacketData* data);
     void ProcessPacket(char* packet, int size);
 
     inline SOCKET Socket() const { return hSocket; }
     inline bool IsGameover() const { return isGameover; }
-    inline std::queue<PacketData*>& GetSendQueue() { return sendQueue; }
+    inline std::queue<ClientPacketData*>& GetSendQueue() { return sendQueue; }
     inline int PlayerId() const{ return playerId; }
     inline void EnterGame() { hasEnteredGame = true; }
 
@@ -68,7 +49,7 @@ private:
     HANDLE hSendMutex = nullptr;
     HANDLE hReceiveMutex = nullptr;
 
-    std::queue<PacketData*> sendQueue;
+    std::queue<ClientPacketData*> sendQueue;
 
     int playerId = 0;
     bool isGameover = false;

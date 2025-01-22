@@ -225,6 +225,37 @@ public:
     }
 };
 
+struct ClientPacketData
+{
+    class GameClient* client = nullptr;
+    PacketType type;
+    size_t size;
+    char* packet;
+
+    ClientPacketData(GameClient* client, PacketType type, size_t size, char* packet)
+        : client(client), type(type), size(size)
+    {
+        this->packet = new char[size];
+        memcpy(this->packet, packet, size);
+    }
+    ~ClientPacketData()
+    {
+        delete[] this->packet;
+    }
+};
+
+struct ServerPacketData
+{
+    PacketType type;
+    size_t size;
+    char* packet;
+
+    ServerPacketData(const PacketType& type, size_t size, char* packet)
+        : type(type), size(size), packet(packet)
+    {
+    }
+};
+
 extern "C"
 {
     void ENGINE_API SerializePacket(const void* packet, size_t packetSize, char* buffer);

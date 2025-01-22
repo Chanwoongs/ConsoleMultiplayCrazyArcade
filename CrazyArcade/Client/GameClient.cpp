@@ -1,6 +1,7 @@
 ﻿#include "GameClient.h"
 
 #include "ClientGame/Game.h"
+#include "Network/Packets.h"
 
 GameClient* GameClient::Instance = nullptr;
 
@@ -55,9 +56,9 @@ GameClient::~GameClient()
     }
 }
 
-GameClient::PacketData* GameClient::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
+ClientPacketData* GameClient::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
 {
-    return new GameClient::PacketData(this, packetType, packetSize, packet);
+    return new ClientPacketData(this, packetType, packetSize, packet);
 }
 
 void GameClient::ConnectServer()
@@ -98,7 +99,7 @@ unsigned WINAPI GameClient::Send(void* arg)
 
     while (!client->IsGameover())
     {
-        PacketData* packetData = nullptr;
+        ClientPacketData* packetData = nullptr;
 
         WaitForSingleObject(client->hSendMutex, INFINITE);
         if (!client->sendQueue.empty())
@@ -148,7 +149,7 @@ unsigned WINAPI GameClient::Receive(void* arg)
     return 0;
 }
 
-void GameClient::EnqueueSend(PacketData* data)
+void GameClient::EnqueueSend(ClientPacketData* data)
 {
     WaitForSingleObject(hSendMutex, INFINITE);
     sendQueue.push(data);

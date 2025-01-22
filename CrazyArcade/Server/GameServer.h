@@ -20,18 +20,6 @@ class GameServer
         SOCKET hClientSocket;
     };
 
-    struct PacketData
-    {
-        PacketType type;
-        size_t size;
-        char* packet;
-
-        PacketData(const PacketType& type, size_t size, char* packet)
-            : type(type), size(size), packet(packet)
-        {
-        }
-    };
-
 public:
     struct SendTask
     {
