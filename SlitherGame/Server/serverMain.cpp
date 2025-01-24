@@ -5,7 +5,7 @@
 #include "Engine/Engine.h"
 #include "EngineGame/Levels/GameLevel.h"
 
-#define TEST 1
+#define TEST 0
 
 unsigned WINAPI AcceptClientsThread(void* arg);
 unsigned WINAPI SynchronizeGameStateThread(void* arg);

@@ -7,7 +7,7 @@
 #include "Levels/MenuLevel.h"
 #include "Network/Packets.h"
 
-#define TEST 1
+#define TEST 0
 
 int main(int argc, char* argv[])
 {
