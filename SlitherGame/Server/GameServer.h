@@ -41,16 +41,7 @@ public:
 
 	void AcceptClients();
 
-	static unsigned WINAPI HandleClient(void* arg);
-    static unsigned WINAPI Send(void* arg);
-    static unsigned WINAPI SynchronizeGameStateThread(void* arg);
-
     void ProcessPacket(SOCKET clientSocket, char* packet);
-	void Send(SendTask* task);
-	void Broadcast(SendTask* task);
-
-    void EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket);
-    void EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket = 0);
 
     void SynchronizeGameState();
 
@@ -58,7 +49,17 @@ public:
     inline bool IsRunning() const { return isRunning; }
     inline void Stop() { isRunning = false; }
 
-	void ErrorHandling(const char* message) const;
+private:
+    static unsigned WINAPI HandleClient(void* arg);
+    static unsigned WINAPI Send(void* arg);
+
+    void Send(SendTask* task);
+    void Broadcast(SendTask* task);
+
+    void EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket);
+    void EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket = 0);
+
+    void ErrorHandling(const char* message) const;
 
 private:
 	SOCKET hServerSocket = 0;

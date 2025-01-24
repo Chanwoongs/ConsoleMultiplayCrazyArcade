@@ -20,12 +20,7 @@ public:
 
     ClientPacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
 
-    void ConnectServer();
     void RunThreads();
-    void RunSendThread(void* arg);
-
-    static unsigned WINAPI Send(void* arg);
-    static unsigned WINAPI Receive(void* arg);
 
     void EnqueueSend(ClientPacketData* data);
     void ProcessPacket(char* packet, int size);
@@ -36,8 +31,16 @@ public:
     inline bool IsGameover() const { return isGameover; }
     inline std::queue<ClientPacketData*>& GetSendQueue() { return sendQueue; }
     inline int PlayerId() const{ return playerId; }
-    inline void EnterGame() { hasEnteredGame = true; }
     inline bool HasEnteredGame() const { return hasEnteredGame; }
+
+    inline void EnterGame() { hasEnteredGame = true; }
+
+private:
+    void ConnectServer();
+    void RunSendThread(void* arg);
+
+    static unsigned WINAPI Send(void* arg);
+    static unsigned WINAPI Receive(void* arg);
 
     void ErrorHandling(const char* message);
 
