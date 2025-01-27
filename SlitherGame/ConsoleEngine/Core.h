@@ -46,6 +46,15 @@ void Log(const char* format, T&&... args)
 	std::cout << buffer;
 }
 
+// 힙 문제 체크
+inline void CheckHeapStatus()
+{
+    if (_heapchk() != _HEAPOK)
+    {
+        DebugBreak();
+    }
+}
+
 // 랜덤 함수
 inline int Random(int min, int max)
 {
