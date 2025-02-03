@@ -288,6 +288,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         int y = Engine::Get().GetRandomInt(3, 15);
         int x = Engine::Get().GetRandomInt(10, 60);
 
+        gameLevel->AddActor(new Player(++playerCount, Vector2(x, y), gameLevel));
 
         gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
 
@@ -314,10 +315,6 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         // EnqueueSend 호출
         EnqueueSend(serializedSize, serializedData, clientSocket);
-        
-        Sleep(1000);
-
-        gameLevel->AddActor(new Player(++playerCount, Vector2(x, y), gameLevel));
         
         delete playerEnterRespondPacket;
     }
