@@ -69,6 +69,9 @@ void GameClient::ConnectServer()
 {
     if (connect(hSocket, (SOCKADDR*)serverAddress, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
     {
+        int errorCode = WSAGetLastError();
+        printf("Connect Error: %d\n", errorCode);
+
         ErrorHandling("connect() error");
     }
     else

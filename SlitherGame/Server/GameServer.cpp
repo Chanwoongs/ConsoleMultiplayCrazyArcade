@@ -356,10 +356,6 @@ void GameServer::SynchronizeGameState()
 
     gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
 
-    GameLevel* g = new GameLevel();
-
-    g->DeserializeGameState(buffer);
-
     GameStateSynchronizePacket* gameStatePacket = new GameStateSynchronizePacket(gameStateSize, buffer);
 
     size_t serializedSize = 0;
