@@ -1,10 +1,14 @@
 ﻿#pragma once
 
 #include <iostream>
+#include <new.h>
+#include <string>
+
 #include <Core.h>
 
 #include "EngineGame/Levels/GameLevel.h"
-#include <new.h>
+
+#define ENUM_TO_STRING_CASE(value) case value: return #value;
 
 enum class ENGINE_API PacketType
 {
@@ -15,6 +19,8 @@ enum class ENGINE_API PacketType
     PLAYER_ENTER_RESPOND,
     GAME_STATE_SYNCHRONIZE
 };
+
+ENGINE_API const char* ToString(PacketType packetType);
 
 struct ENGINE_API PacketHeader 
 {
@@ -279,7 +285,7 @@ public:
     }
 };
 
-struct ClientPacketData
+struct ENGINE_API ClientPacketData
 {
     class GameClient* client = nullptr;
     PacketType type;
@@ -298,7 +304,7 @@ struct ClientPacketData
     }
 };
 
-struct ServerPacketData
+struct ENGINE_API ServerPacketData
 {
     PacketType type;
     size_t size;

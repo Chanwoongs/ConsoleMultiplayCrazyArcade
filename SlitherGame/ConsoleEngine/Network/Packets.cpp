@@ -2,6 +2,20 @@
 
 #include "Packets.h"
 
+const char* ToString(PacketType packetType)
+{
+    switch (packetType)
+    {
+        ENUM_TO_STRING_CASE(PacketType::INPUT);
+        ENUM_TO_STRING_CASE(PacketType::MOVE);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_ENTER_REQUEST);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_EXIT_REQUEST);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_ENTER_RESPOND);
+        ENUM_TO_STRING_CASE(PacketType::GAME_STATE_SYNCHRONIZE);
+    default: return "Unknown";
+    }
+}
+
 void ENGINE_API SerializePacket(const void* packet, size_t packetSize, char* buffer)
 {
     if (_heapchk() != _HEAPOK)

@@ -226,6 +226,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
     if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_REQUEST)
     {
+        printf("Received %s\n", ToString((PacketType)packetHeader->packetType));
+
         CheckHeapStatus();
 
         char buffer[packetBufferSize] = {};
@@ -262,6 +264,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         InputPacket* inputPacket = new InputPacket(0, 0);
         size_t size = 0;
         inputPacket->Deserialize(packet, size);
+
+        printf("Received %s / Player ID: %d\n", ToString((PacketType)packetHeader->packetType), inputPacket->playerId);
         
         if (inputPacket->keyCode == VK_UP)
         {    
@@ -285,6 +289,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_EXIT_REQUEST)
     {
 		PlayerExitRequestPacket* playerExitRequestPacket = (PlayerExitRequestPacket*)packet;
+
+        printf("Received %s / Player ID: %d\n", ToString((PacketType)packetHeader->packetType), playerExitRequestPacket->playerId);
 
 		WaitForSingleObject(mutex, INFINITE);
 		gameLevel->RemovePlayer(playerExitRequestPacket->playerId);
