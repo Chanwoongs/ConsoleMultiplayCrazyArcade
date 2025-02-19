@@ -43,18 +43,20 @@ int main(int argc, char* argv[])
             Sleep(100);
         }
 
+        Sleep(100);
+
+        delete engine;
+        delete server;
+
         WaitForSingleObject(acceptThread, INFINITE);
 
         CloseHandle(acceptThread);
-        delete engine;
-        delete server;
     }
     catch (const std::exception& ex)
     {
         fprintf(stderr, "Error: %s\n", ex.what());
         return -1;
     }
-
 
     return 0;
 }
@@ -64,7 +66,11 @@ unsigned WINAPI AcceptClientsThread(void* arg)
     try
     {
         GameServer* server = static_cast<GameServer*>(arg);
-        server->AcceptClients();
+
+        if (server)
+        {
+            server->AcceptClients();
+        }
     }
     catch (const std::exception& ex)
     {

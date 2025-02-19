@@ -84,6 +84,13 @@ void GameServer::AcceptClients()
         int clientAddressSize = sizeof(clientAddress);
         SOCKET clientSocket = accept(hServerSocket, (SOCKADDR*)&clientAddress, &clientAddressSize);
 
+        if (clientSocket == INVALID_SOCKET)
+        {
+            if (isRunning)
+                break;
+            continue;
+        }
+
         WaitForSingleObject(mutex, INFINITE);
 
         if (gameLevel == nullptr)
