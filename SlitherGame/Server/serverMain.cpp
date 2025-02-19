@@ -31,11 +31,14 @@ int main(int argc, char* argv[])
         HANDLE acceptThread = (HANDLE)_beginthreadex(NULL, 0, AcceptClientsThread, server, 0, NULL); 
 
         Engine* engine = new Engine();
+        engine->SetOnQuitCallBack([&]() {server->Stop();});
 
         while (server->IsRunning())
         {
             // 게임 로직
             server->SynchronizeGameState();
+
+            engine->Run();
 
             Sleep(100);
         }

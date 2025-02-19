@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "Core.h"
-#include "Math/Vector2.h"
+
 #include <random>
+#include <functional>
+
+#include "Math/Vector2.h"
 
 class Level;
 class Actor;
@@ -66,6 +69,7 @@ public:
 
 	// 엔진 종료 함수
 	void QuitGame();
+    void SetOnQuitCallBack(std::function<void()> onQuitCallback);
 
 	// 싱글톤 객체 접근 함수
 	static Engine& Get();
@@ -110,4 +114,7 @@ protected:
 
     // 화면 지울 때 사용할 버퍼(Buffer/Blob)
     char* emptyStringBuffer = nullptr;
+
+    // 종료 시 호출할 콜백 함수.
+    std::function<void()> onQuitCallback; 
 };

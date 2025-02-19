@@ -241,7 +241,17 @@ bool Engine::GetKeyUp(int key)
 void Engine::QuitGame()
 {
 	quit = true;
+
+    if (onQuitCallback)
+    {
+        onQuitCallback();
+    }
 }
+
+void Engine::SetOnQuitCallBack(std::function<void()> onQuitCallback)
+{
+    this->onQuitCallback = onQuitCallback;
+;}
 
 Engine& Engine::Get()
 {
