@@ -184,7 +184,7 @@ void GameClient::ProcessPacket(char* packet, int size)
     }
     else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_CREATE_RESPOND)
     {
-        PlayerCreateRespondPacket playerCreateRespondPacket(0, 0, 0, nullptr, 0);
+        PlayerCreateRespondPacket playerCreateRespondPacket(0);
         playerCreateRespondPacket.Deserialize(packet, size);
 
         playerId = playerCreateRespondPacket.playerId;
@@ -195,7 +195,7 @@ void GameClient::ProcessPacket(char* packet, int size)
         
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
 		currentLevel->SetClientId(playerId);
-        currentLevel->DeserializeGameState(playerCreateRespondPacket.gameStateBuffer);
+
         ReleaseMutex(hReceiveMutex);
 
         Game::Get().EnterGame();

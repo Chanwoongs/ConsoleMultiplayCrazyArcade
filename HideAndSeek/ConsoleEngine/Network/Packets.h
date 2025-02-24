@@ -147,39 +147,23 @@ struct ENGINE_API PlayerCreateRespondPacket
 public:
     PacketHeader header;
     uint32_t playerId;
-    uint32_t posY;
-    uint32_t posX;
-    uint32_t gameStateSize;
-    char* gameStateBuffer;
 
 public:
-    PlayerCreateRespondPacket(const uint32_t& playerId,
-        const uint32_t& posY, const uint32_t& posX,
-        const char* gameStateData, size_t gameStateSize)
-        : playerId(playerId), posY(posY), posX(posX), gameStateBuffer(nullptr), gameStateSize((uint32_t)gameStateSize)
+    PlayerCreateRespondPacket(const uint32_t& playerId)
+        : playerId(playerId)
     {
         header.packetType = (uint32_t)PacketType::PLAYER_CREATE_RESPOND;
         header.packetSize = sizeof(PlayerCreateRespondPacket);
-
-        gameStateBuffer = new char[gameStateSize];
-        memcpy(gameStateBuffer, gameStateData, gameStateSize);
-
-        header.packetSize += (uint32_t)gameStateSize;
     }
 
     ~PlayerCreateRespondPacket()
     {
-        delete[] gameStateBuffer;
     }
 
     char* Serialize(size_t& size)
     {
         size_t totalPacketSize = sizeof(PacketHeader) +
-            sizeof(playerId) +
-            sizeof(posY) +
-            sizeof(posX) +
-            sizeof(gameStateSize) +
-            gameStateSize;
+            sizeof(playerId);
 
         char* sendBuffer = new char[totalPacketSize];
 
@@ -190,18 +174,6 @@ public:
 
         memcpy(sendBuffer + offset, &playerId, sizeof(playerId));
         offset += sizeof(playerId);
-
-        memcpy(sendBuffer + offset, &posY, sizeof(posY));
-        offset += sizeof(posY);
-
-        memcpy(sendBuffer + offset, &posX, sizeof(posX));
-        offset += sizeof(posX);
-
-        memcpy(sendBuffer + offset, &gameStateSize, sizeof(gameStateSize));
-        offset += sizeof(gameStateSize);
-
-        memcpy(sendBuffer + offset, gameStateBuffer, gameStateSize);
-        offset += gameStateSize;
 
         size = offset;
 
@@ -217,20 +189,6 @@ public:
 
         memcpy(&playerId, buffer + offset, sizeof(playerId));
         offset += sizeof(playerId);
-
-        memcpy(&posY, buffer + offset, sizeof(posY));
-        offset += sizeof(posY);
-
-        memcpy(&posX, buffer + offset, sizeof(posX));
-        offset += sizeof(posX);
-
-        memcpy(&gameStateSize, buffer + offset, sizeof(gameStateSize));
-        offset += sizeof(gameStateSize);
-
-        delete[] gameStateBuffer;
-        gameStateBuffer = new char[gameStateSize];
-        memset(gameStateBuffer, 0, gameStateSize);
-        memcpy(gameStateBuffer, buffer + offset, gameStateSize);
     }
 };
 

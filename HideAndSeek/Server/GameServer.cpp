@@ -277,7 +277,6 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         CheckHeapStatus();
 
         char buffer[packetBufferSize] = {};
-        size_t gameStateSize = 0;
 
         CheckHeapStatus();
 
@@ -287,12 +286,11 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         int x = Engine::Get().GetRandomInt(10, 60);
 
         gameLevel->AddActor(new Player(++playerCount, Vector2(x, y), gameLevel));
-        gameLevel->SerializeGameState(buffer, packetBufferSize, gameStateSize);
 
         CheckHeapStatus();
 
         PlayerCreateRespondPacket* playerCreateRespondPacket =
-            new PlayerCreateRespondPacket(playerCount, y, x, buffer, gameStateSize);
+            new PlayerCreateRespondPacket(playerCount);
 
         ReleaseMutex(mutex);
 
