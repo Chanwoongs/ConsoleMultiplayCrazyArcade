@@ -95,12 +95,6 @@ void GameServer::AcceptClients()
 
         WaitForSingleObject(mutex, INFINITE);
 
-        if (gameLevel == nullptr)
-        {
-            gameLevel = new GameLevel();
-            gameLevel->LoadMap();
-        }
-
         if (clientSockets.size() >= 8) 
         {
             closesocket(clientSocket);
@@ -243,7 +237,7 @@ unsigned __stdcall GameServer::Sychronize(void* arg)
 
         server->SynchronizeGameState();
 
-        Sleep(10);
+        Sleep(1);
     }
 
     return 0;
@@ -285,12 +279,10 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         int y = Engine::Get().GetRandomInt(3, 15);
         int x = Engine::Get().GetRandomInt(10, 60);
 
-        gameLevel->AddActor(new Player(++playerCount, Vector2(x, y), gameLevel));
-
         CheckHeapStatus();
 
         PlayerCreateRespondPacket* playerCreateRespondPacket =
-            new PlayerCreateRespondPacket(playerCount);
+            new PlayerCreateRespondPacket(++playerCount);
 
         ReleaseMutex(mutex);
 
@@ -307,6 +299,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             SendTask::Type::SEND,
             clientSocket
         );
+
+        if (gameLevel == nullptr)
+        {
+            gameLevel = new GameLevel();
+            gameLevel->LoadMap();
+            gameLevel->SetClientId(99999999);
+        }
+
+        gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel));
 
         delete playerCreateRespondPacket;
     }
@@ -389,7 +390,7 @@ void GameServer::EnqueueSend(const ServerPacketData* packetData, const SendTask:
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ type, clientSocket, packetData->size, packetData->packet };
+    SendTask* task = new SendTask{ type, packetData->type , clientSocket, packetData->size, packetData->packet };
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);

@@ -30,6 +30,7 @@ public:
         };
 
         Type type;
+        PacketType packetType;
         SOCKET clientSocket;
         size_t size;
         char* packet;
