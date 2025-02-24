@@ -42,6 +42,7 @@ public:
 	void AcceptClients();
 
     void ProcessPacket(SOCKET clientSocket, char* packet);
+    ServerPacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
 
     void SynchronizeGameState();
 
@@ -57,8 +58,8 @@ private:
     void Send(SendTask* task);
     void Broadcast(SendTask* task);
 
-    void EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket);
-    void EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket = 0);
+    void EnqueueSend(ServerPacketData* packetData, SendTask::Type type, SOCKET clientSocket = 0);
+    void EnqueueBroadcast(const ServerPacketData& packetData);
 
     void ErrorHandling(const char* message) const;
 

@@ -169,19 +169,33 @@ void GameClient::ProcessPacket(char* packet, int size)
 
     if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_RESPOND)
     {
-        PlayerEnterRespondPacket playerEnterRespondPacket(0, 0, 0, nullptr, 0);
-        playerEnterRespondPacket.Deserialize(packet, size);
+        Game::Get().LoadLevel(new GameLevel);
 
-        playerId = playerEnterRespondPacket.playerId;
+        PlayerCreateRequestPacket* playerCreateRequestPacket = new PlayerCreateRequestPacket();
+
+        EnqueueSend(
+            CreatePacketData(
+                PacketType::PLAYER_CREATE_REQUEST,
+                sizeof(playerCreateRequestPacket),
+                (char*)playerCreateRequestPacket)
+        );
+
+        delete playerCreateRequestPacket;
+    }
+    else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_CREATE_RESPOND)
+    {
+        PlayerCreateRespondPacket playerCreateRespondPacket(0, 0, 0, nullptr, 0);
+        playerCreateRespondPacket.Deserialize(packet, size);
+
+        playerId = playerCreateRespondPacket.playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
 
         WaitForSingleObject(hReceiveMutex, INFINITE);
-        Game::Get().LoadLevel(new GameLevel);
         
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
 		currentLevel->SetClientId(playerId);
-        currentLevel->DeserializeGameState(playerEnterRespondPacket.gameStateBuffer);
+        currentLevel->DeserializeGameState(playerCreateRespondPacket.gameStateBuffer);
         ReleaseMutex(hReceiveMutex);
 
         Game::Get().EnterGame();

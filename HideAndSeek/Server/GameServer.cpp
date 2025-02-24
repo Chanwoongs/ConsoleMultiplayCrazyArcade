@@ -257,6 +257,23 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     {
         printf("Received %s\n", ToString((PacketType)packetHeader->packetType));
 
+        PlayerEnterRespondPacket* playerEnterRespondPacket = new PlayerEnterRespondPacket;
+
+        EnqueueSend(
+            CreatePacketData(
+                PacketType(playerEnterRespondPacket->header.packetType),
+                sizeof(playerEnterRespondPacket),
+                (char*)playerEnterRespondPacket), 
+            SendTask::Type::SEND, 
+            clientSocket
+        );
+
+        delete playerEnterRespondPacket;
+    }
+    else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_CREATE_REQUEST)
+    {
+        printf("Received %s\n", ToString((PacketType)packetHeader->packetType));
+
         CheckHeapStatus();
 
         char buffer[packetBufferSize] = {};
@@ -274,19 +291,26 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         CheckHeapStatus();
 
-        PlayerEnterRespondPacket* playerEnterRespondPacket =
-            new PlayerEnterRespondPacket(playerCount, y, x, buffer, gameStateSize);
+        PlayerCreateRespondPacket* playerCreateRespondPacket =
+            new PlayerCreateRespondPacket(playerCount, y, x, buffer, gameStateSize);
 
         ReleaseMutex(mutex);
 
         CheckHeapStatus();
 
         size_t serializedSize;
-        char* serializedData = playerEnterRespondPacket->Serialize(serializedSize);
+        char* serializedData = playerCreateRespondPacket->Serialize(serializedSize);
 
-        EnqueueSend(serializedSize, serializedData, clientSocket);
-        
-        delete playerEnterRespondPacket;
+        EnqueueSend(
+            CreatePacketData(
+                PacketType::PLAYER_CREATE_RESPOND,
+                serializedSize,
+                serializedData),
+            SendTask::Type::SEND,
+            clientSocket
+        );
+
+        delete playerCreateRespondPacket;
     }
     else if ((PacketType)packetHeader->packetType == PacketType::INPUT)
     {
@@ -331,6 +355,11 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     delete[] packet;
 }
 
+ServerPacketData* GameServer::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
+{
+    return new ServerPacketData(packetType, packetSize, packet);
+}
+
 void GameServer::Send(SendTask* task)
 {
     WaitForSingleObject(mutex, INFINITE);
@@ -358,21 +387,11 @@ void GameServer::Broadcast(SendTask* task)
     ReleaseMutex(mutex);
 }
 
-void GameServer::EnqueueSend(size_t packetSize, char* packet, SOCKET clientSocket)
+void GameServer::EnqueueSend(ServerPacketData* packetData, SendTask::Type type, SOCKET clientSocket)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 
-    SendTask* task = new SendTask{ SendTask::Type::SEND, clientSocket, packetSize, packet};
-    sendQueue.push(task);
-
-    ReleaseMutex(sendMutex);
-}
-
-void GameServer::EnqueueBroadcast(size_t packetSize, char* packet, SOCKET clientSocket)
-{
-    WaitForSingleObject(sendMutex, INFINITE);
-
-    SendTask* task = new SendTask{ SendTask::Type::BROADCAST, clientSocket, packetSize, packet };
+    SendTask* task = new SendTask{ type, clientSocket, packetData->size, packetData->packet };
     sendQueue.push(task);
 
     ReleaseMutex(sendMutex);
@@ -396,7 +415,13 @@ void GameServer::SynchronizeGameState()
     size_t serializedSize = 0;
     char* serializedData = gameStatePacket->Serialize(serializedSize);
 
-    EnqueueBroadcast(serializedSize, serializedData);
+    EnqueueSend(
+        CreatePacketData(
+            PacketType::GAME_STATE_SYNCHRONIZE,
+            serializedSize,
+            serializedData),
+        SendTask::Type::BROADCAST
+    );
 
     delete gameStatePacket;
 

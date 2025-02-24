@@ -9,8 +9,10 @@ const char* ToString(PacketType packetType)
         ENUM_TO_STRING_CASE(PacketType::INPUT);
         ENUM_TO_STRING_CASE(PacketType::MOVE);
         ENUM_TO_STRING_CASE(PacketType::PLAYER_ENTER_REQUEST);
-        ENUM_TO_STRING_CASE(PacketType::PLAYER_EXIT_REQUEST);
         ENUM_TO_STRING_CASE(PacketType::PLAYER_ENTER_RESPOND);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_CREATE_REQUEST);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_CREATE_RESPOND);
+        ENUM_TO_STRING_CASE(PacketType::PLAYER_EXIT_REQUEST);
         ENUM_TO_STRING_CASE(PacketType::GAME_STATE_SYNCHRONIZE);
     default: return "Unknown";
     }
