@@ -313,16 +313,6 @@ void Engine::ProcessInput()
                     = (record.Event.MouseEvent.dwButtonState & RIGHTMOST_BUTTON_PRESSED) != 0;
             }
             break;
-
-            //		//case WINDOW_BUFFER_SIZE_EVENT:
-            //{
-            //	char buffer[100];
-            //	sprintf_s(buffer, 100, "(%d,%d)", 
-            //		record.Event.WindowBufferSizeEvent.dwSize.X, record.Event.WindowBufferSizeEvent.dwSize.Y
-            //	);
-
-            //	MessageBoxA(nullptr, buffer, "Test", MB_OK);
-            //} break;
             }
         }
     }
