@@ -43,6 +43,8 @@ GameServer::GameServer(const char* port)
 
     sendMutex = CreateMutex(NULL, FALSE, NULL); 
     sendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
+    
+    synchronizeThread = (HANDLE)_beginthreadex(NULL, 0, Sychronize, this, 0, NULL);
 
     isRunning = true;
 }
@@ -224,6 +226,26 @@ unsigned WINAPI GameServer::Send(void* arg)
             Sleep(10);
         }
     }
+
+    return 0;
+}
+
+unsigned __stdcall GameServer::Sychronize(void* arg)
+{
+    GameServer* server = static_cast<GameServer*>(arg);
+
+    while (server->isRunning)
+    {
+        if (server->gameLevel == nullptr)
+        {
+            continue;
+        }
+
+        server->SynchronizeGameState();
+
+        Sleep(10);
+    }
+
     return 0;
 }
 
