@@ -52,6 +52,7 @@ public:
 private:
     static unsigned WINAPI HandleClient(void* arg);
     static unsigned WINAPI Send(void* arg);
+    static unsigned WINAPI Sychronize(void* arg);
 
     void Send(SendTask* task);
     void Broadcast(SendTask* task);
@@ -69,8 +70,10 @@ private:
 
     HANDLE mutex = nullptr;
     HANDLE sendMutex = nullptr;
+
 	std::vector<HANDLE> clientThreads;
     HANDLE sendThread = nullptr;
+    HANDLE synchronizeThread = nullptr;
 
     std::queue<SendTask*> sendQueue;
 

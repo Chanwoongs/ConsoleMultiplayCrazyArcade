@@ -35,9 +35,6 @@ int main(int argc, char* argv[])
 
         while (server->IsRunning())
         {
-            // 게임 로직
-            server->SynchronizeGameState();
-
             engine->Run();
 
             Sleep(100);
