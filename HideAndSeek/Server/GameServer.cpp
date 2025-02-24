@@ -353,12 +353,12 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     delete[] packet;
 }
 
-ServerPacketData* GameServer::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
+ServerPacketData* GameServer::CreatePacketData(const PacketType packetType, const size_t packetSize, const char* packet)
 {
     return new ServerPacketData(packetType, packetSize, packet);
 }
 
-void GameServer::Send(SendTask* task)
+void GameServer::Send(const SendTask* task)
 {
     WaitForSingleObject(mutex, INFINITE);
 
@@ -370,7 +370,7 @@ void GameServer::Send(SendTask* task)
     ReleaseMutex(mutex);
 }
 
-void GameServer::Broadcast(SendTask* task)
+void GameServer::Broadcast(const SendTask* task)
 {
     WaitForSingleObject(mutex, INFINITE);
 
@@ -385,7 +385,7 @@ void GameServer::Broadcast(SendTask* task)
     ReleaseMutex(mutex);
 }
 
-void GameServer::EnqueueSend(ServerPacketData* packetData, SendTask::Type type, SOCKET clientSocket)
+void GameServer::EnqueueSend(const ServerPacketData* packetData, const SendTask::Type type, const SOCKET clientSocket)
 {
     WaitForSingleObject(sendMutex, INFINITE);
 

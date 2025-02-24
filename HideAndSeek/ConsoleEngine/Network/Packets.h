@@ -296,8 +296,8 @@ struct ENGINE_API ServerPacketData
     size_t size;
     char* packet;
 
-    ServerPacketData(const PacketType& type, size_t size, char* packet)
-        : type(type), size(size), packet(packet)
+    ServerPacketData(const PacketType& type, const size_t size, const char* packet)
+        : type(type), size(size)
     {
         this->packet = new char[size];
         memcpy(this->packet, packet, size);

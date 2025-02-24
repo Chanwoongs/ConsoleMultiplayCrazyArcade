@@ -18,7 +18,7 @@ public:
     GameClient(const char* ip, const char* port);
     ~GameClient();
 
-    ClientPacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
+    ClientPacketData* CreatePacketData(const PacketType packetType, const size_t packetSize, char* packet);
 
     void RunThreads();
 

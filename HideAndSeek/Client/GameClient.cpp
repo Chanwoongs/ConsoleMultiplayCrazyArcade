@@ -60,7 +60,7 @@ GameClient::~GameClient()
     CloseHandle(hReceiveThread);
 }
 
-ClientPacketData* GameClient::CreatePacketData(PacketType packetType, size_t packetSize, char* packet)
+ClientPacketData* GameClient::CreatePacketData(const PacketType packetType, const size_t packetSize, char* packet)
 {
     return new ClientPacketData(this, packetType, packetSize, packet);
 }

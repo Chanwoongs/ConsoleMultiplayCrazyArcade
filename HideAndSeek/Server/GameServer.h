@@ -42,7 +42,7 @@ public:
 	void AcceptClients();
 
     void ProcessPacket(SOCKET clientSocket, char* packet);
-    ServerPacketData* CreatePacketData(PacketType packetType, size_t packetSize, char* packet);
+    ServerPacketData* CreatePacketData(const PacketType packetType, const size_t packetSize, const char* packet);
 
     void SynchronizeGameState();
 
@@ -55,11 +55,10 @@ private:
     static unsigned WINAPI Send(void* arg);
     static unsigned WINAPI Sychronize(void* arg);
 
-    void Send(SendTask* task);
-    void Broadcast(SendTask* task);
+    void Send(const SendTask* task);
+    void Broadcast(const SendTask* task);
 
-    void EnqueueSend(ServerPacketData* packetData, SendTask::Type type, SOCKET clientSocket = 0);
-    void EnqueueBroadcast(const ServerPacketData& packetData);
+    void EnqueueSend(const ServerPacketData* packetData, const SendTask::Type type, const SOCKET clientSocket = 0);
 
     void ErrorHandling(const char* message) const;
 
