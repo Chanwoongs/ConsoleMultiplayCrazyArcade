@@ -67,6 +67,8 @@ public:
 	bool GetKeyDown(int key);
 	bool GetKeyUp(int key);
 
+    Vector2 MousePosition() const;
+
 	// 엔진 종료 함수
 	void QuitGame();
     void SetOnQuitCallBack(std::function<void()> onQuitCallback);
@@ -111,6 +113,9 @@ protected:
 
     // 화면 크기
     Vector2 screenSize;
+
+    // 마우스 좌표 위치.
+    Vector2 mousePosition;
 
     // 화면 지울 때 사용할 버퍼(Buffer/Blob)
     char* emptyStringBuffer = nullptr;

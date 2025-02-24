@@ -11,22 +11,25 @@
 // 스태틱 변수 초기화
 Engine* Engine::Instance = nullptr;
 
-BOOL WINAPI WindowEventHandler(DWORD CtrlType)
+// 콘솔 창 메시지 콜백 함수.
+BOOL WINAPI MessageProcessor(DWORD message)
 {
-    if (CtrlType == CTRL_CLOSE_EVENT)
+    switch (message)
     {
+    case CTRL_CLOSE_EVENT:
         Engine::Get().QuitGame();
         return true;
-    }
 
-    return false;
+    default:
+        return false;
+    }
 }
 
 Engine::Engine()
     : quit(false), mainLevel(nullptr), screenSize(80, 30)
 {
     // 윈도우 창 버튼 입력 핸들러 등록.
-    SetConsoleCtrlHandler(WindowEventHandler, true);
+    SetConsoleCtrlHandler(MessageProcessor, true);
 
     // 랜덤 시드 설정
     srand((unsigned int)time(nullptr));
@@ -58,6 +61,11 @@ Engine::Engine()
     
     // 마지막에 널 문자 추가
     emptyStringBuffer[screenSize.y * (screenSize.x + 1)] = '\0';
+
+    // 마우스/윈도우 이벤트 활성화.
+    HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
+    int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
+    SetConsoleMode(inputHandle, flag);
 
     // 디버깅
 //#if _DEBUG
@@ -238,6 +246,11 @@ bool Engine::GetKeyUp(int key)
 	return !keyState[key].isKeyDown && keyState[key].wasKeyDown;
 }
 
+Vector2 Engine::MousePosition() const
+{
+    return mousePosition;
+}
+
 void Engine::QuitGame()
 {
 	quit = true;
@@ -260,11 +273,59 @@ Engine& Engine::Get()
 
 void Engine::ProcessInput()
 {
-	for (int i = 0; i < 255; i++)
-	{
-		// (GetAsyncKeyState(i) & 0x8000) 현재 프레임에 눌렸는지 저장
-		keyState[i].isKeyDown = (GetAsyncKeyState(i) & 0x8000) ? true : false;
-	}
+    static HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
+
+    INPUT_RECORD record;
+    DWORD events;
+    if (PeekConsoleInput(inputHandle, &record, 1, &events) && events > 0)
+    {
+        if (ReadConsoleInput(inputHandle, &record, 1, &events))
+        {
+            switch (record.EventType)
+            {
+            case KEY_EVENT:
+            {
+                // 키 눌림 상태 업데이트.
+                if (record.Event.KeyEvent.bKeyDown)
+                {
+                    keyState[record.Event.KeyEvent.wVirtualKeyCode].isKeyDown = true;
+                }
+                // 키 눌림 해제 상태 업데이트.
+                else
+                {
+                    keyState[record.Event.KeyEvent.wVirtualKeyCode].isKeyDown = false;
+                }
+            }
+            break;
+
+            case MOUSE_EVENT:
+            {
+                // 마우스 커서 위치 업데이트.
+                mousePosition.x = record.Event.MouseEvent.dwMousePosition.X;
+                mousePosition.y = record.Event.MouseEvent.dwMousePosition.Y;
+
+                // 마우스 왼쪽 버튼 클릭 상태 업데이트.
+                keyState[VK_LBUTTON].isKeyDown
+                    = (record.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) != 0;
+
+                // 마우스 오른쪽 버튼 클릭 상태 업데이트.
+                keyState[VK_RBUTTON].isKeyDown
+                    = (record.Event.MouseEvent.dwButtonState & RIGHTMOST_BUTTON_PRESSED) != 0;
+            }
+            break;
+
+            //		//case WINDOW_BUFFER_SIZE_EVENT:
+            //{
+            //	char buffer[100];
+            //	sprintf_s(buffer, 100, "(%d,%d)", 
+            //		record.Event.WindowBufferSizeEvent.dwSize.X, record.Event.WindowBufferSizeEvent.dwSize.Y
+            //	);
+
+            //	MessageBoxA(nullptr, buffer, "Test", MB_OK);
+            //} break;
+            }
+        }
+    }
 }
 
 void Engine::CheckInput()
