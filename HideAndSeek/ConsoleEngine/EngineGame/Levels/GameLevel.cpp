@@ -49,6 +49,8 @@ void GameLevel::AddActor(Actor* newActor)
 
 void GameLevel::Update(float deltaTime)
 {
+    if (clientId == 0) return;
+
     Super::Update(deltaTime);
 
     // 게임이 클리어됐으면, 게임 종료 처리
