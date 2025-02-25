@@ -14,7 +14,7 @@ public:
     };
 
     // RTTI
-    RTTI_DECLARATIONS(DrawableActor, Actor);
+    RTTI_DECLARATIONS(DrawableActor, Actor)
 
 public:
     DrawableActor(Vector2 position, const char* image = "");

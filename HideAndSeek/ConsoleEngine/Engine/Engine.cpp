@@ -4,9 +4,11 @@
 
 #include <iostream>
 #include <Windows.h>
+#include <time.h>
 
 #include "Level/Level.h"
 #include "Actor/Actor.h"
+#include "Render/ScreenBuffer.h"
 
 // 스태틱 변수 초기화
 Engine* Engine::Instance = nullptr;
@@ -40,38 +42,30 @@ Engine::Engine()
     // 기본 타겟 프레임 속도 설정
     SetTargetFrameRate(60.0f);
 
-    // 화면 지울 때 사용할 버퍼 초기화
-    // 1. 버퍼 크기 할당
-    emptyStringBuffer = new char[screenSize.y * (screenSize.x + 1) + 1];
+    // 화면 버퍼 초기화.
+    // 1. 버퍼 크기 할당.
+    imageBuffer = new CHAR_INFO[(screenSize.x + 1) * screenSize.y + 1];
 
-    // 버퍼 덮어 쓰기
-    memset(emptyStringBuffer, ' ', screenSize.y * (screenSize.x + 1) + 1);
 
-    // 2. 값 할당
-    for (int y = 0; y < screenSize.y; ++y)
-    {
-        for (int x = 0; x < screenSize.x; x++)
-        {
-            emptyStringBuffer[y * (screenSize.x + 1) + x] = ' ';
-        }
+    // 버퍼 초기화.
+    ClearImageBuffer();
 
-        // 각 줄 끝에 개행 문자 추가
-        emptyStringBuffer[y * (screenSize.x + 1) + screenSize.x] = '\n';
-    }
-    
-    // 마지막에 널 문자 추가
-    emptyStringBuffer[screenSize.y * (screenSize.x + 1)] = '\0';
+    // 두 개의 버퍼 생성 (버퍼를 번갈아 사용하기 위해-더블 버퍼링).
+    COORD size = { (short)screenSize.x, (short)screenSize.y };
+    //renderTargets[0] = new ScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE), size);
+    renderTargets[0] = new ScreenBuffer(size);
+    renderTargets[1] = new ScreenBuffer(size);
+
+    // 스왑 버퍼.
+    Present();
 
     // 마우스/윈도우 이벤트 활성화.
     HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
     int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
     SetConsoleMode(inputHandle, flag);
 
-    // 디버깅
-//#if _DEBUG
-//    char buffer[2048];
-//    strcpy_s(buffer, 2048, emptyStringBuffer);
-//#endif
+    // std::cin/std::cout 연결 끊기.
+    std::ios::sync_with_stdio(false);
 }
 
 Engine::~Engine()
@@ -81,7 +75,12 @@ Engine::~Engine()
 		delete mainLevel;
 	}
 
-    delete[] emptyStringBuffer;
+    // 클리어 버퍼 삭제.
+    delete[] imageBuffer;
+
+    // 화면 버퍼 삭제.
+    delete renderTargets[0];
+    delete renderTargets[1];
 }
 
 void Engine::Run()
@@ -128,12 +127,9 @@ void Engine::Run()
             ProcessInput();
 
             // 업데이트 가능한 상태에서만 프레임 업데이트 처리
-            if (shouldUpdate)
-            {
-                CheckInput();
-                Update(deltaTime);
-                Draw();
-            }
+            CheckInput();
+            Update(deltaTime);
+            Draw();
 
 			// 키 상태 저장
 			SavePreviousKeyStates();
@@ -147,9 +143,6 @@ void Engine::Run()
                 //mainLevel->DestroyActor();
                 mainLevel->ProcessAddedAndDestroyActor();
             }
-
-            // 프레임 활성화
-            shouldUpdate = true;
 		}
 	}
 }
@@ -170,7 +163,6 @@ void Engine::AddActor(Actor* newActor)
         return;
     }
 
-    shouldUpdate = false;
     mainLevel->AddActor(newActor);
 }
 
@@ -181,7 +173,6 @@ void Engine::DestroyActor(Actor* targetActor)
         return;
     }
 
-    shouldUpdate = false;
     targetActor->Destroy();
 }
 
@@ -210,25 +201,6 @@ void Engine::SetCursorType(CursorType cursorType)
 
     // 2. 설정
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
-}
-
-void Engine::SetCursorPosition(const Vector2& position)
-{
-    SetCursorPosition(position.x, position.y);
-}
-
-void Engine::SetCursorPosition(int x, int y)
-{
-    static HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD coord = { static_cast<short>(x), static_cast<short>(y) };
-    SetConsoleCursorPosition(handle, coord);
-}
-
-void Engine::SetTargetFrameRate(float targetFrameRate)
-{
-    this->targetframeRate = targetFrameRate;
-
-    targetOneFrameTime = 1.0f / targetFrameRate;
 }
 
 bool Engine::GetKey(int key)
@@ -335,35 +307,36 @@ void Engine::Update(float deltaTime)
 	}
 }
 
-void Engine::Clear()
+void Engine::Draw(const Vector2& position, const char* image, Color color)
 {
-    // 화면의 (0, 0)으로 이동.
-    SetCursorPosition(0, 0);
+    std::string imageStr(image);
+    std::vector<std::string> drawData;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = imageStr.find('\n')) != std::string::npos) 
+    {
+        token = imageStr.substr(0, pos);
+        drawData.push_back(token);
+        imageStr.erase(0, pos + 1);
+    }
+    drawData.push_back(imageStr);
 
-    //// 화면 지우기.
-    //int height = 25;
-    //for (int i = 0; i < height; i++)
-    //{
-    //    Log("                              \n");
-    //}
-    
-    // 화면 지우기
-    std::cout << emptyStringBuffer;
-
-    // 화면의 (0, 0)으로 이동.
-    SetCursorPosition(0, 0);
+    for (int y = 0; y < (int)drawData.size(); ++y)
+    {
+        const std::string& drawString = drawData[y];
+        for (int x = 0; x < (int)drawString.length(); ++x)
+        {
+            int index = ((position.y + y) * screenSize.x) + position.x + x;
+            imageBuffer[index].Char.AsciiChar = drawString[x];
+            imageBuffer[index].Attributes = (unsigned long)color;
+        }
+    }
 }
 
-void Engine::Draw()
+void Engine::SetTargetFrameRate(float targetFrameRate)
 {
-    // 화면 지우기
-    //Clear();
-
-	// 레벨 그리기
-	if (mainLevel != nullptr)
-	{
-		mainLevel->Draw();
-	}
+    this->targetFrameRate = targetFrameRate;
+    targetOneFrameTime = 1.0f / targetFrameRate;
 }
 
 void Engine::SavePreviousKeyStates()
@@ -372,4 +345,60 @@ void Engine::SavePreviousKeyStates()
 	{
 		keyState[i].wasKeyDown = keyState[i].isKeyDown;
 	}
+}
+
+void Engine::Clear()
+{
+    ClearImageBuffer();
+    //GetRenderer()->Clear();
+}
+
+void Engine::Draw()
+{
+    // 화면 지우기.
+    Clear();
+
+    // 레벨 그리기.
+    if (mainLevel != nullptr)
+    {
+        mainLevel->Draw();
+    }
+
+    // 백버퍼에 데이터 쓰기.
+    GetRenderer()->Draw(imageBuffer);
+
+    // 프론트<->백 버퍼 교환.
+    Present();
+}
+
+void Engine::Present()
+{
+    // Swap Buffer.
+    SetConsoleActiveScreenBuffer(GetRenderer()->buffer);
+    currentRenderTargetIndex = 1 - currentRenderTargetIndex;
+}
+
+void Engine::ClearImageBuffer()
+{
+    // 버퍼 덮어쓰기.
+    for (int y = 0; y < screenSize.y; ++y)
+    {
+        // 버퍼 덮어쓰기.
+        for (int x = 0; x < screenSize.x + 1; ++x)
+        {
+            auto& buffer = imageBuffer[(y * (screenSize.x + 1)) + x];
+            buffer.Char.AsciiChar = ' ';
+            buffer.Attributes = 0;
+        }
+
+        // 각 줄 끝에 개행 문자 추가.
+        auto& buffer = imageBuffer[(y * (screenSize.x + 1)) + screenSize.x + 1];
+        buffer.Char.AsciiChar = '\n';
+        buffer.Attributes = 0;
+    }
+
+    // 마지막에 널 문자 추가.
+    auto& buffer = imageBuffer[(screenSize.x + 1) * screenSize.y];
+    buffer.Char.AsciiChar = '\0';
+    buffer.Attributes = 0;
 }

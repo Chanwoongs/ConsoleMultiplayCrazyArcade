@@ -9,6 +9,7 @@
 
 class Level;
 class Actor;
+class ScreenBuffer;
 
 // 입력 처리를 위한 구조체
 struct KeyState
@@ -17,13 +18,6 @@ struct KeyState
 	bool isKeyDown = false;
 	// 이전 프레임에 키가 눌렸었는지 확인
 	bool wasKeyDown = false;
-};
-
-enum class CursorType
-{
-    NoCursor,
-    SolidCursor,
-    NormalCursor
 };
 
 // 엔진 클래스
@@ -45,8 +39,8 @@ public:
 
     // 화면 좌표 관련 함수
     void SetCursorType(CursorType cursorType);
-    void SetCursorPosition(const Vector2& position);
-    void SetCursorPosition(int x, int y);
+
+    void Draw(const Vector2& position, const char* image, Color color = Color::White);
 
     // 화면 크기 반환 함수
     inline Vector2 ScreenSize() const { return screenSize; }
@@ -84,14 +78,18 @@ public:
 
     void Clear();                       // 화면 지우기.
 	void Draw();						// Render
+    void Present();
 
 	// 이전 프레임의 키 상태를 저장하는 함수
 	void SavePreviousKeyStates();
 
+    inline ScreenBuffer* GetRenderer() const { return renderTargets[currentRenderTargetIndex]; }
+    void ClearImageBuffer();
+
 protected:
 
     // 타겟 프레임 변수 (초당 프레임)
-    float targetframeRate = 60.0f;
+    float targetFrameRate = 60.0f;
     
     // 한 프레임 시간 값 (초 단위)
     float targetOneFrameTime = 0.0f;
@@ -108,17 +106,18 @@ protected:
 	// 메인 레벨 변수
 	Level* mainLevel;
 
-    // 프레임을 업데이트해야 하는지 여부를 나타내는 변수.
-    bool shouldUpdate = true;
-
     // 화면 크기
     Vector2 screenSize;
 
     // 마우스 좌표 위치.
     Vector2 mousePosition;
 
-    // 화면 지울 때 사용할 버퍼(Buffer/Blob)
-    char* emptyStringBuffer = nullptr;
+    // 화면 버퍼(Buffer/Blob).
+    CHAR_INFO* imageBuffer = nullptr;
+
+    // 화면 버퍼.
+    ScreenBuffer* renderTargets[2];
+    int currentRenderTargetIndex = 0;
 
     // 종료 시 호출할 콜백 함수.
     std::function<void()> onQuitCallback; 

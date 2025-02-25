@@ -9,6 +9,7 @@
 #include "EngineGame/Actors/Ground.h"
 #include "EngineGame/Actors/Wall.h"
 #include "EngineGame/Actors/Player.h"
+//#include "EngineGame/Actors/Map.h"
 
 #include "Network/Packets.h"
 
@@ -27,6 +28,11 @@ GameLevel::~GameLevel()
     delete map;
 
     for (auto& player : players)
+    {
+        delete player;
+    }
+
+    for (auto& player : tempPlayers)
     {
         delete player;
     }
@@ -64,11 +70,7 @@ void GameLevel::Update(float deltaTime)
             return;
         }
 
-        // 커서 이동
-        Engine::Get().SetCursorPosition(0, Engine::Get().ScreenSize().y);
-
-        // 메세지 출력
-        Log("Game Clear!");
+        Engine::Get().Draw(Vector2(0, Engine::Get().ScreenSize().y), "Game Clear!", Color::White);
 
         // 쓰레드 정지
         Sleep(2000);
@@ -257,7 +259,6 @@ void GameLevel::LoadMap()
     {
         std::cout << "읽어온 크기가 다름\n";
         __debugbreak();
-        return;
     }
 
     buffer[readSize] = '\0';
@@ -351,12 +352,6 @@ void GameLevel::DeserializeGameState(const char* buffer)
     memcpy(&playerCount, buffer + offset, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 
-    //for (auto* player : players)
-    //{
-    //    delete player;
-    //}
-    //players.clear();
-
     for (uint32_t i = 0; i < playerCount; ++i)
     {
         size_t playerSize = 0;
@@ -364,9 +359,6 @@ void GameLevel::DeserializeGameState(const char* buffer)
         newPlayer->Deserialize(buffer + offset, playerSize);
         tempPlayers.push_back(newPlayer);
         offset += playerSize;
-
-        //AddActor(newPlayer);
-        //offset += playerSize;
     }
 
     isThreadWriting = false;

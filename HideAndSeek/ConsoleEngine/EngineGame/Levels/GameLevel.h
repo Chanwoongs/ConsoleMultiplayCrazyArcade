@@ -4,6 +4,7 @@
 
 #include <queue>
 
+class DrawableActor;
 class ENGINE_API GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)
@@ -33,7 +34,8 @@ private:
 
 private:
 
-    class DrawableActor* map = nullptr;
+    DrawableActor* map = nullptr;
+    //class Map* map = nullptr;
 
     std::vector<class Player*> players;
 
@@ -43,7 +45,8 @@ private:
 
     bool isMapInitialized = false;
 
-    class DrawableActor* tempMap = nullptr;
+    DrawableActor* tempMap = nullptr;
+    //class Map* tempMap = nullptr;
 
     std::vector<class Player*> tempPlayers;
 

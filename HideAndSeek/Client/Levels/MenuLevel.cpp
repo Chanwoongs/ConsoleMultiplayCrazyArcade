@@ -44,14 +44,10 @@ void MenuLevel::Draw()
 {
 	Super::Draw();
 
-	Engine::Get().SetCursorPosition(0, 0);
-	
-	SetColor(unselectedColor);
-	Log("Slither Game!\n\n");
+    Engine::Get().Draw(Vector2(0, 0), "Hide and Seek!", Color::Green);
 
 	for (int ix = 0; ix < length; ++ix)
 	{
-		SetColor(ix == currentIndex ? selectedColor : unselectedColor);
-		Log("%s\n", menuItems[ix]->menuText);
+        Engine::Get().Draw(Vector2(0, ix + 2), menuItems[ix]->menuText, ix == currentIndex ? selectedColor : unselectedColor);
 	}
 }
