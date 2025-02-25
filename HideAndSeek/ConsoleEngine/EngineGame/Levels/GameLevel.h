@@ -53,4 +53,8 @@ private:
     HANDLE mutex = 0;
 
     int clientId = 0;
+
+    int mapWidth = 0;
+
+    int mapHeight = 0;
 };
