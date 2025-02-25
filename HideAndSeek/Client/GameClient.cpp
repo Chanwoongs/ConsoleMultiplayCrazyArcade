@@ -205,6 +205,26 @@ void GameClient::ProcessPacket(char* packet, int size)
 
         Game::Get().EnterGame();
     }
+    else if ((PacketType)packetHeader->packetType == PacketType::MOVE_PATH)
+    {
+        WaitForSingleObject(hReceiveMutex, INFINITE);
+
+        MovePathPacket* movePathPacket = new MovePathPacket(0, 0, nullptr);
+        movePathPacket->Deserialize(packet, size);
+
+        std::vector<Vector2> path;
+        size_t offset = 0;
+        while (offset < movePathPacket->pathBufferSize)
+        {
+            Vector2 position(0, 0);
+            position.Deserialize(movePathPacket->pathBuffer, offset);
+            path.push_back(position);
+        }
+
+        delete movePathPacket;
+
+        ReleaseMutex(hReceiveMutex);
+    }
     else if ((PacketType)packetHeader->packetType == PacketType::GAME_STATE_SYNCHRONIZE)
     {
         if (!hasEnteredGame) return;

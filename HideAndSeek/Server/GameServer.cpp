@@ -362,11 +362,36 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         printf("Received %s / Player ID: %d / Clicked Position: (%d, %d)\n", ToString((PacketType)packetHeader->packetType), mouseInputPacket->playerId, mouseInputPacket->posX, mouseInputPacket->posY);
 
         WaitForSingleObject(mutex, INFINITE);
+
+        std::vector<Vector2> path;
         if (mouseInputPacket->keyCode == VK_LBUTTON)
         {
-            gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY));
+            path = std::move(gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY)));
         }
 
+        char pathBuffer[packetBufferSize] = {};
+        size_t pathBufferSize = 0;
+
+        for (auto& p : path)
+        {
+            p.Serialize(pathBuffer, pathBufferSize);
+        }
+
+        MovePathPacket* movePathPacket = new MovePathPacket(path.size(), pathBufferSize, pathBuffer);
+
+        size_t serializedSize = 0;
+        char* serializedData = movePathPacket->Serialize(serializedSize);
+
+        EnqueueSend(
+            CreatePacketData(
+                PacketType::MOVE_PATH,
+                serializedSize,
+                serializedData),
+            SendTask::Type::SEND,
+            clientSocket
+        );
+
+        delete movePathPacket;
         delete mouseInputPacket;
 
         ReleaseMutex(mutex);

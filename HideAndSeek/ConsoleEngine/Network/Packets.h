@@ -15,6 +15,7 @@ enum class ENGINE_API PacketType
     KEY_INPUT = 1,
     MOUSE_INPUT,
     MOVE,
+    MOVE_PATH,
     PLAYER_ENTER_REQUEST,
     PLAYER_ENTER_RESPOND,
     PLAYER_CREATE_REQUEST,
@@ -153,6 +154,78 @@ public:
         offset += sizeof(posX);
     }
 };
+
+struct ENGINE_API MovePathPacket
+{
+public:
+    PacketHeader header;
+    uint32_t pathCount;
+    uint32_t pathBufferSize;
+    char* pathBuffer;
+
+    MovePathPacket(uint32_t pathCount, size_t pathBufferSize, char* pathData)
+        : pathCount(pathCount), pathBuffer(pathData), pathBufferSize((uint32_t)pathBufferSize)
+    {
+        header.packetType = (uint32_t)PacketType::MOVE_PATH;
+        header.packetSize = sizeof(MovePathPacket);
+
+        pathBuffer = new char[pathBufferSize];
+        memcpy(pathBuffer, pathData, pathBufferSize);
+
+        header.packetSize += (uint32_t)pathBufferSize;
+    }
+    ~MovePathPacket()
+    {
+        delete[] pathBuffer;
+    }
+
+    char* Serialize(size_t& size)
+    {
+        size_t totalPacketSize = sizeof(PacketHeader) +
+            sizeof(pathBufferSize) +
+            pathBufferSize;
+
+        char* sendBuffer = new char[totalPacketSize];
+
+        size_t offset = 0;
+
+        memcpy(sendBuffer + offset, &header, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(sendBuffer + offset, &pathCount, sizeof(pathCount));
+        offset += sizeof(pathCount);
+
+        memcpy(sendBuffer + offset, &pathBufferSize, sizeof(pathBufferSize));
+        offset += sizeof(pathBufferSize);
+
+        memcpy(sendBuffer + offset, pathBuffer, pathBufferSize);
+        offset += pathBufferSize;
+
+        size = offset;
+
+        return sendBuffer;
+    }
+
+    void Deserialize(const char* buffer, size_t size)
+    {
+        size_t offset = 0;
+
+        memcpy(&header, buffer + offset, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(&pathCount, buffer + offset, sizeof(pathCount));
+        offset += sizeof(pathCount);
+
+        memcpy(&pathBufferSize, buffer + offset, sizeof(pathBufferSize));
+        offset += sizeof(pathBufferSize);
+
+        delete[] pathBuffer;
+        pathBuffer = new char[pathBufferSize];
+        memset(pathBuffer, 0, pathBufferSize);
+        memcpy(pathBuffer, buffer + offset, pathBufferSize);
+    }
+};
+
 
 struct ENGINE_API MovePacket
 {
