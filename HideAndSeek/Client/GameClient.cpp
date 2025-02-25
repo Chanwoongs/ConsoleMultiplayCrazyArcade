@@ -16,7 +16,12 @@ GameClient::GameClient(const char* ip, const char* port)
     hSendMutex = CreateMutex(NULL, FALSE, NULL);
     if (hSendMutex == NULL)
     {
-        ErrorHandling("Mutex creation error!");
+        ErrorHandling("hSendMutex creation error!");
+    }
+    hReceiveMutex = CreateMutex(NULL, FALSE, NULL);
+    if (hReceiveMutex == NULL)
+    {
+        ErrorHandling("hReceiveMutex creation error!");
     }
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -36,8 +41,6 @@ GameClient::GameClient(const char* ip, const char* port)
     serverAddress->sin_port = htons(atoi(port));
 
     ConnectServer();
-
-    //@TODO: 서버에 연결된 뒤에 서버에게 플레이어 ID를 받아야함.
 }
 
 GameClient::~GameClient()
@@ -169,7 +172,9 @@ void GameClient::ProcessPacket(char* packet, int size)
 
     if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_RESPOND)
     {
+        WaitForSingleObject(hReceiveMutex, INFINITE);
         Game::Get().LoadLevel(new GameLevel);
+        ReleaseMutex(hReceiveMutex);
 
         PlayerCreateRequestPacket* playerCreateRequestPacket = new PlayerCreateRequestPacket();
 
@@ -187,12 +192,12 @@ void GameClient::ProcessPacket(char* packet, int size)
         PlayerCreateRespondPacket playerCreateRespondPacket(0);
         playerCreateRespondPacket.Deserialize(packet, size);
 
+        WaitForSingleObject(hReceiveMutex, INFINITE);
+
         playerId = playerCreateRespondPacket.playerId;
 
         printf("부여 받은 PlayerId : %d", playerId);
 
-        WaitForSingleObject(hReceiveMutex, INFINITE);
-        
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
 		currentLevel->SetClientId(playerId);
 

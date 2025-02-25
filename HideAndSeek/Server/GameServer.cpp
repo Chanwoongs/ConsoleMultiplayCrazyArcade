@@ -42,6 +42,7 @@ GameServer::GameServer(const char* port)
     }
 
     sendMutex = CreateMutex(NULL, FALSE, NULL); 
+    mutex = CreateMutex(NULL, FALSE, NULL); 
     sendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
     
     synchronizeThread = (HANDLE)_beginthreadex(NULL, 0, Sychronize, this, 0, NULL);
@@ -319,32 +320,32 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         delete playerCreateRespondPacket;
     }
-    else if ((PacketType)packetHeader->packetType == PacketType::INPUT)
+    else if ((PacketType)packetHeader->packetType == PacketType::KEY_INPUT)
     {
-        InputPacket* inputPacket = new InputPacket(0, 0);
+        KeyInputPacket* keyInputPacket = new KeyInputPacket(0, 0);
         size_t size = 0;
-        inputPacket->Deserialize(packet, size);
+        keyInputPacket->Deserialize(packet, size);
 
-        printf("Received %s / Player ID: %d\n", ToString((PacketType)packetHeader->packetType), inputPacket->playerId);
+        printf("Received %s / Player ID: %d\n", ToString((PacketType)packetHeader->packetType), keyInputPacket->playerId);
         
-        if (inputPacket->keyCode == VK_UP)
+        if (keyInputPacket->keyCode == VK_UP)
         {    
-            gameLevel->MovePlayer(inputPacket->playerId, Direction::UP);
+            gameLevel->MovePlayer(keyInputPacket->playerId, Direction::UP);
         }
-        else if (inputPacket->keyCode == VK_DOWN)
+        else if (keyInputPacket->keyCode == VK_DOWN)
         {
-            gameLevel->MovePlayer(inputPacket->playerId, Direction::DOWN);
+            gameLevel->MovePlayer(keyInputPacket->playerId, Direction::DOWN);
         }
-        else if (inputPacket->keyCode == VK_RIGHT)
+        else if (keyInputPacket->keyCode == VK_RIGHT)
         {
-            gameLevel->MovePlayer(inputPacket->playerId, Direction::RIGHT);
+            gameLevel->MovePlayer(keyInputPacket->playerId, Direction::RIGHT);
         }
-        else if (inputPacket->keyCode == VK_LEFT)
+        else if (keyInputPacket->keyCode == VK_LEFT)
         {
-            gameLevel->MovePlayer(inputPacket->playerId, Direction::LEFT);
+            gameLevel->MovePlayer(keyInputPacket->playerId, Direction::LEFT);
         }
 
-        delete inputPacket;
+        delete keyInputPacket;
     }
     else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_EXIT_REQUEST)
     {

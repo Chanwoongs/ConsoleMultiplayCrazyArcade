@@ -73,57 +73,61 @@ void Game::CheckInput()
 {
     if (!GameClient::Get().HasEnteredGame()) return;
 
+    Engine::CheckInput();
+
     if (Engine::Get().GetKeyDown(VK_UP))
     {
-        InputPacket* inputPacket = new InputPacket(GameClient::Get().PlayerId(), VK_UP);
+        KeyInputPacket* keyInputPacket = new KeyInputPacket(GameClient::Get().PlayerId(), VK_UP);
         
-        size_t serializedSize = 0;
-        char* serializedData = inputPacket->Serialize(serializedSize);
+        size_t serializedSize = 0; 
+        char* serializedData = keyInputPacket->Serialize(serializedSize);
         GameClient::Get().EnqueueSend(
             GameClient::Get().CreatePacketData(
-                PacketType(inputPacket->header.packetType),
+                PacketType(keyInputPacket->header.packetType),
                 serializedSize,
                 serializedData));
-        //InputPacket* i = new InputPacket(0, 0);
-        //size_t s = 0;
-        //i->Deserialize(serializedData, s);
 
-        delete inputPacket;
+        delete keyInputPacket;
     }
     if (Engine::Get().GetKeyDown(VK_DOWN))
     {
-        InputPacket* inputPacket = new InputPacket(GameClient::Get().PlayerId(), VK_DOWN);
+        KeyInputPacket* keyInputPacket = new KeyInputPacket(GameClient::Get().PlayerId(), VK_DOWN);
 
         GameClient::Get().EnqueueSend(
             GameClient::Get().CreatePacketData(
-                PacketType(inputPacket->header.packetType),
-                sizeof(InputPacket),
-                (char*)inputPacket));
+                PacketType(keyInputPacket->header.packetType),
+                sizeof(KeyInputPacket),
+                (char*)keyInputPacket));
 
-        delete inputPacket;
+        delete keyInputPacket;
     }
     if (Engine::Get().GetKeyDown(VK_RIGHT))
     {
-        InputPacket* inputPacket = new InputPacket(GameClient::Get().PlayerId(), VK_RIGHT);
+        KeyInputPacket* keyInputPacket = new KeyInputPacket(GameClient::Get().PlayerId(), VK_RIGHT);
 
         GameClient::Get().EnqueueSend(
             GameClient::Get().CreatePacketData(
-                PacketType(inputPacket->header.packetType),
-                sizeof(InputPacket),
-                (char*)inputPacket));
+                PacketType(keyInputPacket->header.packetType),
+                sizeof(KeyInputPacket),
+                (char*)keyInputPacket));
 
-        delete inputPacket;
+        delete keyInputPacket;
     }
     if (Engine::Get().GetKeyDown(VK_LEFT))
     {
-        InputPacket* inputPacket = new InputPacket(GameClient::Get().PlayerId(), VK_LEFT);
+        KeyInputPacket* keyInputPacket = new KeyInputPacket(GameClient::Get().PlayerId(), VK_LEFT);
 
         GameClient::Get().EnqueueSend(
             GameClient::Get().CreatePacketData(
-                PacketType(inputPacket->header.packetType),
-                sizeof(InputPacket),
-                (char*)inputPacket));
+                PacketType(keyInputPacket->header.packetType),
+                sizeof(KeyInputPacket),
+                (char*)keyInputPacket));
 
-        delete inputPacket;
+        delete keyInputPacket;
+    }
+
+    if (Engine::Get().GetKeyDown(VK_LBUTTON))
+    {
+        exit(0);
     }
 }
