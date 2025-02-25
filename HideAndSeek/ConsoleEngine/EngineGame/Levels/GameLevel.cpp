@@ -140,15 +140,6 @@ void GameLevel::Draw()
         {
             if (players[i] != nullptr)
             {
-				if (i == clientId - 1)
-				{
-					players[i]->SetColor(Color::Blue);
-				}
-				else
-				{
-					players[i]->SetColor(Color::Red);
-				}
-
                 players[i]->Draw();
             }
         }
@@ -357,6 +348,7 @@ void GameLevel::DeserializeGameState(const char* buffer)
         size_t playerSize = 0;
         auto* newPlayer = new Player(0, Vector2(0, 0), this);
         newPlayer->Deserialize(buffer + offset, playerSize);
+		newPlayer->Initialize(clientId);
         tempPlayers.push_back(newPlayer);
         offset += playerSize;
     }

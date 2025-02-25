@@ -15,10 +15,14 @@ public:
     virtual void Deserialize(const char* buffer, size_t& size) override;
 
     virtual void Update(float deltaTime) override;
+    virtual void Draw() override;
+    void Initialize(const int clientId);
 
 private:
     // 게임 레벨을 참조하는 변수
     GameLevel* refLevel = nullptr;
 
     int id = 0;
+
+    bool isSeeker = false;
 };

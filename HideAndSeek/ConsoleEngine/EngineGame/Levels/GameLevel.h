@@ -35,7 +35,6 @@ private:
 private:
 
     DrawableActor* map = nullptr;
-    //class Map* map = nullptr;
 
     std::vector<class Player*> players;
 
@@ -46,7 +45,6 @@ private:
     bool isMapInitialized = false;
 
     DrawableActor* tempMap = nullptr;
-    //class Map* tempMap = nullptr;
 
     std::vector<class Player*> tempPlayers;
 
