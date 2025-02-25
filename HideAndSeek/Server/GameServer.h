@@ -84,7 +84,8 @@ private:
 
     bool isRunning = false;
     bool isMapInitialzed = false;
-    bool isSynchronizing;
+    bool isSynchronizing = false;
+    bool isSeekerSet = false;
 
     class GameLevel* gameLevel = nullptr;
 

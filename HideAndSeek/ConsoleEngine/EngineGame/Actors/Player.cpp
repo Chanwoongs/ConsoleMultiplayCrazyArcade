@@ -5,8 +5,8 @@
 #include "Engine/Engine.h"
 #include "EngineGame/Levels/GameLevel.h"
 
-Player::Player(int id, const Vector2& position, GameLevel* level)
-    : DrawableActor(position, "H"), id(id), refLevel(level), isSeeker(false)
+Player::Player(int id, const Vector2& position, GameLevel* level, bool isSeeker)
+    : DrawableActor(position, "H"), id(id), refLevel(level), isSeeker(isSeeker)
 {
     this->position = position;
 

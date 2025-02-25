@@ -307,7 +307,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             gameLevel->SetClientId(99999999);
         }
 
-        gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel));
+        if (!isSeekerSet)
+        {
+            gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel, true));
+            isSeekerSet = true;
+        }
+        else
+        {
+            gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel, false));
+        }
 
         delete playerCreateRespondPacket;
     }

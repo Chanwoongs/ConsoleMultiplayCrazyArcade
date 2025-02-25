@@ -9,7 +9,7 @@ class ENGINE_API Player : public DrawableActor
 
 public:
     Player() = default;
-    Player(int id, const Vector2& position, GameLevel* level);
+    Player(int id, const Vector2& position, GameLevel* level, bool isSeeker = false);
 
     virtual void Serialize(char* buffer, size_t& size) override;
     virtual void Deserialize(const char* buffer, size_t& size) override;
