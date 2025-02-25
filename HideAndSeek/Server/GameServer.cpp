@@ -1,8 +1,11 @@
 ﻿#include "GameServer.h"
 
 #include "Engine/Engine.h"
+
 #include "EngineGame/Levels/GameLevel.h" 
 #include "EngineGame/Actors/Player.h"
+
+#include "Algorithms/AStar.h"
 
 GameServer::GameServer(const char* port)
 {
@@ -350,9 +353,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
     else if ((PacketType)packetHeader->packetType == PacketType::MOUSE_INPUT)
     {
         MouseInputPacket* mouseInputPacket = new MouseInputPacket(0, 0, 0, 0);
+
         size_t size = 0;
         mouseInputPacket->Deserialize(packet, size);
         printf("Received %s / Player ID: %d / Clicked Position: (%d, %d)\n", ToString((PacketType)packetHeader->packetType), mouseInputPacket->playerId, mouseInputPacket->posX, mouseInputPacket->posY);
+
+        if (mouseInputPacket->keyCode == VK_LBUTTON)
+        {
+            gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY));
+        }
 
         delete mouseInputPacket;
     }

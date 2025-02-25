@@ -7,8 +7,6 @@
 
 #include "Math/Vector2.h"
 
-using namespace std;
-
 class Node
 {
 public:
@@ -27,9 +25,9 @@ public:
 class AStar
 {
 public:
-	static vector<Vector2> FindPath(Vector2 startPosition, Vector2 endPosition);
+	static std::vector<Vector2> FindPath(Vector2 startPosition, Vector2 endPosition);
 
-    static void SetMapData(std::vector<vector<char>>&& data);
+    static void SetMapData(std::vector<std::vector<char>>&& data);
 
 private:
     static int Hash(Vector2 point) {

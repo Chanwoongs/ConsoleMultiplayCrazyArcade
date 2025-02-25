@@ -14,10 +14,10 @@ void AStar::SetMapData(std::vector<std::vector<char>>&& data)
     mapWidth = (int)mapData[0].size();
 }
 
-vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
+std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 {
-	priority_queue<Node*, vector<Node*>, Compare> openList;
-	unordered_map<int, Node*> allNodes;
+	std::priority_queue<Node*, std::vector<Node*>, Compare> openList;
+    std::unordered_map<int, Node*> allNodes;
 
 	Node* startNode = new Node(startPosition);
 	openList.push(startNode);
@@ -32,7 +32,7 @@ vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 		// 경로를 찾았다
 		if (current->position.x == endPosition.x && current->position.y == endPosition.y)
 		{
-			vector<Vector2> path;
+            std::vector<Vector2> path;
 
 			// 경로를 벡터에 담고
 			while (current->parent)
@@ -43,7 +43,7 @@ vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 				current = current->parent;
 			}
 			// 역순으로 
-			reverse(path.begin(), path.end());
+            std::reverse(path.begin(), path.end());
 
             // 모든 동적으로 할당된 노드 해제
             for (auto& pair : allNodes)
@@ -99,5 +99,5 @@ vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
         delete pair.second;
     }
 	
-	return vector<Vector2>(); // 경로를 찾을 수 없음
+	return std::vector<Vector2>(); // 경로를 찾을 수 없음
 }

@@ -28,6 +28,8 @@ public:
 
     void MovePlayer(int playerId, enum class Direction direction);
 	void RemovePlayer(int playerId);
+
+    std::vector<Vector2> FindPath(const int playerId, const Vector2& end);
     
 private:
     bool CheckGameClear();
