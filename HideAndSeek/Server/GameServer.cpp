@@ -347,6 +347,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         delete keyInputPacket;
     }
+    else if ((PacketType)packetHeader->packetType == PacketType::MOUSE_INPUT)
+    {
+        MouseInputPacket* mouseInputPacket = new MouseInputPacket(0, 0, 0, 0);
+        size_t size = 0;
+        mouseInputPacket->Deserialize(packet, size);
+        printf("Received %s / Player ID: %d / Clicked Position: (%d, %d)\n", ToString((PacketType)packetHeader->packetType), mouseInputPacket->playerId, mouseInputPacket->posX, mouseInputPacket->posY);
+
+        delete mouseInputPacket;
+    }
     else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_EXIT_REQUEST)
     {
 		PlayerExitRequestPacket* playerExitRequestPacket = (PlayerExitRequestPacket*)packet;

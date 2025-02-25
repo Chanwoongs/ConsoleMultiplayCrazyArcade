@@ -73,6 +73,8 @@ void Game::CheckInput()
 {
     if (!GameClient::Get().HasEnteredGame()) return;
 
+    Engine::CheckInput();
+
     if (Engine::Get().GetKeyDown(VK_UP))
     {
         KeyInputPacket* keyInputPacket = new KeyInputPacket(GameClient::Get().PlayerId(), VK_UP);
@@ -125,5 +127,18 @@ void Game::CheckInput()
                 (char*)keyInputPacket));
 
         delete keyInputPacket;
+    }
+    
+    if (Engine::Get().GetKeyDown(VK_LBUTTON))
+    {
+        MouseInputPacket* mouseInputPacket = new MouseInputPacket(GameClient::Get().PlayerId(), VK_LBUTTON, Engine::Get().MousePosition().y, Engine::Get().MousePosition().x);
+
+        GameClient::Get().EnqueueSend(
+            GameClient::Get().CreatePacketData(
+                PacketType(mouseInputPacket->header.packetType),
+                sizeof(MouseInputPacket),
+                (char*)mouseInputPacket));
+
+        delete mouseInputPacket;
     }
 }

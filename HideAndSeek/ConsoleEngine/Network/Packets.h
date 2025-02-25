@@ -13,6 +13,7 @@
 enum class ENGINE_API PacketType
 {
     KEY_INPUT = 1,
+    MOUSE_INPUT,
     MOVE,
     PLAYER_ENTER_REQUEST,
     PLAYER_ENTER_RESPOND,
@@ -82,6 +83,74 @@ public:
 
         memcpy(&keyCode, buffer + offset, sizeof(keyCode));
         offset += sizeof(keyCode);
+    }
+};
+
+struct ENGINE_API MouseInputPacket
+{
+public:
+    PacketHeader header;
+    uint32_t playerId;
+    uint32_t keyCode;
+    uint32_t posY;
+    uint32_t posX;
+
+public:
+    MouseInputPacket(const uint32_t& playerId, const uint8_t& keyCode, const uint32_t& posY, const uint32_t posX)
+        : playerId(playerId), keyCode(keyCode), posY(posY), posX(posX)
+    {
+        header.packetType = (uint32_t)PacketType::MOUSE_INPUT;
+        header.packetSize = sizeof(MouseInputPacket);
+    }
+
+    char* Serialize(size_t& size)
+    {
+        size_t totalPacketSize = sizeof(PacketHeader) +
+            sizeof(playerId) +
+            sizeof(keyCode);
+
+        char* sendBuffer = new char[totalPacketSize];
+
+        size_t offset = 0;
+
+        memcpy(sendBuffer + offset, &header, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(sendBuffer + offset, &playerId, sizeof(playerId));
+        offset += sizeof(playerId);
+
+        memcpy(sendBuffer + offset, &keyCode, sizeof(keyCode));
+        offset += sizeof(keyCode);
+
+        memcpy(sendBuffer + offset, &posY, sizeof(posY));
+        offset += sizeof(posY);
+
+        memcpy(sendBuffer + offset, &posX, sizeof(posX));
+        offset += sizeof(posX);
+
+        size = offset;
+
+        return sendBuffer;
+    }
+
+    void Deserialize(const char* buffer, size_t size)
+    {
+        size_t offset = 0;
+
+        memcpy(&header, buffer + offset, sizeof(PacketHeader));
+        offset += sizeof(PacketHeader);
+
+        memcpy(&playerId, buffer + offset, sizeof(playerId));
+        offset += sizeof(playerId);
+
+        memcpy(&keyCode, buffer + offset, sizeof(keyCode));
+        offset += sizeof(keyCode);
+
+        memcpy(&posY, buffer + offset, sizeof(posY));
+        offset += sizeof(posY);
+
+        memcpy(&posX, buffer + offset, sizeof(posX));
+        offset += sizeof(posX);
     }
 };
 
