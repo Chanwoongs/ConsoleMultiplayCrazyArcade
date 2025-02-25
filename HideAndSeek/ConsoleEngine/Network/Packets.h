@@ -12,7 +12,7 @@
 
 enum class ENGINE_API PacketType
 {
-    INPUT = 1,
+    KEY_INPUT = 1,
     MOVE,
     PLAYER_ENTER_REQUEST,
     PLAYER_ENTER_RESPOND,
@@ -31,7 +31,7 @@ public:
     uint32_t packetSize;
 };
 
-struct ENGINE_API InputPacket
+struct ENGINE_API KeyInputPacket
 {
 public:
     PacketHeader header;
@@ -39,11 +39,11 @@ public:
     uint32_t keyCode;
 
 public:
-    InputPacket(const uint32_t& playerId, const uint8_t& keyCode)
+    KeyInputPacket(const uint32_t& playerId, const uint8_t& keyCode)
         : playerId(playerId), keyCode(keyCode)
     {
-        header.packetType = (uint32_t)PacketType::INPUT;
-        header.packetSize = sizeof(InputPacket);
+        header.packetType = (uint32_t)PacketType::KEY_INPUT;
+        header.packetSize = sizeof(KeyInputPacket);
     }
 
     char* Serialize(size_t& size)

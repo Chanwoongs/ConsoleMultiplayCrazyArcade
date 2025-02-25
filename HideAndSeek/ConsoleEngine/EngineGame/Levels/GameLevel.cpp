@@ -294,7 +294,7 @@ void GameLevel::LoadMap()
 	// 맵 파일 불러와 업로드
 	// 파일 읽기
 	FILE* file = nullptr;
-	fopen_s(&file, "../Assets/Maps/Stage1.txt", "rb");
+	fopen_s(&file, "../Assets/Maps/Map.txt", "rb");
 
 	// 파일 처리
 	if (file == nullptr)
