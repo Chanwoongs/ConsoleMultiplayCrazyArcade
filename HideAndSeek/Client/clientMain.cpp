@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     GameClient* client = new GameClient("127.0.0.1", "9190");
 #endif
     Game* game = new Game();
-    game->LoadLevel(new MenuLevel);
+    game->RequestLevelChange(new MenuLevel);
 
     client->RunThreads();
 

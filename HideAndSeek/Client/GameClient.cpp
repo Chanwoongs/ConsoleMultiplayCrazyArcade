@@ -174,7 +174,7 @@ void GameClient::ProcessPacket(char* packet, int size)
 
     if ((PacketType)packetHeader->packetType == PacketType::PLAYER_ENTER_RESPOND)
     {
-        Game::Get().LoadLevel(new GameLevel);
+        Game::Get().RequestLevelChange(new GameLevel);
 
         PlayerCreateRequestPacket* playerCreateRequestPacket = new PlayerCreateRequestPacket();
 

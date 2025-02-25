@@ -28,7 +28,7 @@ BOOL WINAPI MessageProcessor(DWORD message)
 }
 
 Engine::Engine()
-    : quit(false), mainLevel(nullptr), screenSize(80, 30)
+    : quit(false), mainLevel(nullptr), screenSize(80, 30), levelChangeRequested(false), pendingLevel(nullptr)
 {
     // 윈도우 창 버튼 입력 핸들러 등록.
     SetConsoleCtrlHandler(MessageProcessor, true);
@@ -120,6 +120,26 @@ void Engine::Run()
 		float deltaTime = static_cast<float>(currentTime - previousTime) / 
 			static_cast<float>(frequency.QuadPart);
 
+        // 레벨 변경 요청이 있는지 확인
+        if (levelChangeRequested && pendingLevel != nullptr)
+        {
+            // 여기서 안전하게 레벨 변경
+            if (mainLevel)
+            {
+                delete mainLevel;
+                system("cls");
+            }
+
+            mainLevel = pendingLevel;
+            pendingLevel = nullptr;
+            levelChangeRequested = false;
+
+            // 마우스/윈도우 이벤트 재활성화
+            static HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
+            static int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
+            SetConsoleMode(inputHandle, flag);
+        }
+
 		// 프레임 확인
         if (deltaTime >= targetOneFrameTime)
         {
@@ -153,6 +173,12 @@ void Engine::LoadLevel(Level* newLevel)
 
 	// 메인 레벨 설정
 	mainLevel = newLevel;
+}
+
+void Engine::RequestLevelChange(Level* newLevel)
+{
+    pendingLevel = newLevel;
+    levelChangeRequested = true;
 }
 
 void Engine::AddActor(Actor* newActor)

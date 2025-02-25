@@ -33,6 +33,9 @@ public:
 	// 레벨 추가 함수
 	void LoadLevel(Level* newLevel);
 
+    // 즉시 변경하지 않고 레벨 변경 요청만 하는 메서드
+    void RequestLevelChange(Level* newLevel);
+
     // 액터 추가 / 삭제 함수
     void AddActor(Actor* newActor);
     void DestroyActor(Actor* targetActor);
@@ -105,6 +108,10 @@ protected:
 
 	// 메인 레벨 변수
 	Level* mainLevel;
+
+    // 로드 대기 중인 레벨
+    Level* pendingLevel; 
+    bool levelChangeRequested;
 
     // 화면 크기
     Vector2 screenSize;
