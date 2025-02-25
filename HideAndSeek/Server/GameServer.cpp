@@ -41,7 +41,8 @@ GameServer::GameServer(const char* port)
         ErrorHandling("listen() error");
     }
 
-    sendMutex = CreateMutex(NULL, FALSE, NULL); 
+    sendMutex = CreateMutex(NULL, FALSE, NULL);
+    mutex = CreateMutex(NULL, FALSE, NULL);
     sendThread = (HANDLE)_beginthreadex(NULL, 0, Send, this, 0, NULL);
     
     synchronizeThread = (HANDLE)_beginthreadex(NULL, 0, Sychronize, this, 0, NULL);

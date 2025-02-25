@@ -18,6 +18,11 @@ GameClient::GameClient(const char* ip, const char* port)
     {
         ErrorHandling("Mutex creation error!");
     }
+    hReceiveMutex = CreateMutex(NULL, FALSE, NULL);
+    if (hReceiveMutex == NULL)
+    {
+        ErrorHandling("Mutex creation error!");
+    }
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {

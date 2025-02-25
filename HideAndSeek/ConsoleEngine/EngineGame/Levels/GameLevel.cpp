@@ -17,8 +17,10 @@
 GameLevel::GameLevel()
 {
     system("cls");
-    // 커서 감추기
+    
+    mutex = CreateMutex(NULL, FALSE, NULL);
 
+    // 커서 감추기
     Engine::Get().SetCursorType(CursorType::NoCursor);
 
     map = new DrawableActor(Vector2(0, 0));
@@ -435,16 +437,13 @@ void GameLevel::DeserializeGameState(const char* buffer)
 
     if (tempPlayers.size() > 0 || tempMap != nullptr)
     {
+        ReleaseMutex(mutex); // 조기 반환 전에 mutex 해제
         return;
     }
 
     isThreadWriting = true;
 
     size_t offset = 0;
-
-    //size_t mapSize = 0;
-    //map->Deserialize(buffer + offset, mapSize);
-    //offset += mapSize;  
 
     size_t mapSize = 0;
     tempMap = new DrawableActor(Vector2(0, 0));
@@ -460,7 +459,7 @@ void GameLevel::DeserializeGameState(const char* buffer)
         size_t playerSize = 0;
         auto* newPlayer = new Player(0, Vector2(0, 0), this);
         newPlayer->Deserialize(buffer + offset, playerSize);
-		newPlayer->Initialize(clientId);
+        newPlayer->Initialize(clientId);
         tempPlayers.push_back(newPlayer);
         offset += playerSize;
     }
