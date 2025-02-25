@@ -46,6 +46,7 @@ Engine::Engine()
     // 1. 버퍼 크기 할당.
     imageBuffer = new CHAR_INFO[(screenSize.x + 1) * screenSize.y + 1];
 
+
     // 버퍼 초기화.
     ClearImageBuffer();
 
@@ -139,6 +140,7 @@ void Engine::Run()
             // 액터 정리 (삭제 요청된 액터들 정리)
             if (mainLevel)
             {
+                //mainLevel->DestroyActor();
                 mainLevel->ProcessAddedAndDestroyActor();
             }
 		}
@@ -147,23 +149,10 @@ void Engine::Run()
 
 void Engine::LoadLevel(Level* newLevel)
 {
-    // 기존 레벨이 있다면 삭제 후 교체.
-    if (mainLevel)
-    {
-        delete mainLevel;
-        system("cls");
-        mainLevel = newLevel;
+	// 기존 레벨이 있다면 삭제 후 교체
 
-        // 마우스/윈도우 이벤트 활성화.
-        static HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
-        static int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
-        SetConsoleMode(inputHandle, flag);
-
-        return;
-    }
-
-    // 메인 레벨 설정.
-    mainLevel = newLevel;
+	// 메인 레벨 설정
+	mainLevel = newLevel;
 }
 
 void Engine::AddActor(Actor* newActor)
@@ -314,7 +303,7 @@ void Engine::Update(float deltaTime)
 	// 레벨 업데이트
 	if (mainLevel != nullptr)
 	{
-        mainLevel->Update(deltaTime);
+		mainLevel->Update(deltaTime);
 	}
 }
 
