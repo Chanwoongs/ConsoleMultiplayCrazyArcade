@@ -288,8 +288,6 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         PlayerCreateRespondPacket* playerCreateRespondPacket =
             new PlayerCreateRespondPacket(++playerCount);
 
-        ReleaseMutex(mutex);
-
         CheckHeapStatus();
 
         size_t serializedSize;
@@ -322,6 +320,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         }
 
         delete playerCreateRespondPacket;
+
+        ReleaseMutex(mutex);
     }
     else if ((PacketType)packetHeader->packetType == PacketType::KEY_INPUT)
     {
@@ -330,7 +330,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         keyInputPacket->Deserialize(packet, size);
 
         printf("Received %s / Player ID: %d\n", ToString((PacketType)packetHeader->packetType), keyInputPacket->playerId);
-        
+
+        WaitForSingleObject(mutex, INFINITE);
         if (keyInputPacket->keyCode == VK_UP)
         {    
             gameLevel->MovePlayer(keyInputPacket->playerId, Direction::UP);
@@ -349,6 +350,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         }
 
         delete keyInputPacket;
+
+        ReleaseMutex(mutex);
     }
     else if ((PacketType)packetHeader->packetType == PacketType::MOUSE_INPUT)
     {
@@ -358,12 +361,15 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
         mouseInputPacket->Deserialize(packet, size);
         printf("Received %s / Player ID: %d / Clicked Position: (%d, %d)\n", ToString((PacketType)packetHeader->packetType), mouseInputPacket->playerId, mouseInputPacket->posX, mouseInputPacket->posY);
 
+        WaitForSingleObject(mutex, INFINITE);
         if (mouseInputPacket->keyCode == VK_LBUTTON)
         {
             gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY));
         }
 
         delete mouseInputPacket;
+
+        ReleaseMutex(mutex);
     }
     else if ((PacketType)packetHeader->packetType == PacketType::PLAYER_EXIT_REQUEST)
     {
