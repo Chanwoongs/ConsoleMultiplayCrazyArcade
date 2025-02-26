@@ -249,6 +249,16 @@ std::vector<Vector2> GameLevel::FindPath(const int playerId, const Vector2& end)
     return path;
 }
 
+void GameLevel::SetClientPlayerPath(std::vector<Vector2*>&& path)
+{
+    WaitForSingleObject(mutex, INFINITE);
+
+    clientPlayerPath.clear();
+    clientPlayerPath = std::move(path);
+
+    ReleaseMutex(mutex);
+}
+
 bool GameLevel::CheckGameClear()
 {
     return false;

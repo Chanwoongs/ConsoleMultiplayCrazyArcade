@@ -35,10 +35,7 @@ public:
 	void RemovePlayer(int playerId);
 
     std::vector<Vector2> FindPath(const int playerId, const Vector2& end);
-    inline void SetClientPlayerPath(std::vector<Vector2*>&& path)
-    {
-        clientPlayerPath = std::move(path);
-    }
+    void SetClientPlayerPath(std::vector<Vector2*>&& path);
     
 private:
     bool CheckGameClear();
