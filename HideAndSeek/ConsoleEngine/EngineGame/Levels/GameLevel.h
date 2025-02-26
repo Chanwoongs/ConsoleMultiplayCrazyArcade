@@ -26,6 +26,9 @@ public:
     void SerializeGameState(char* buffer, size_t bufferSize, size_t& outSize);
     void DeserializeGameState(const char* buffer);
 
+    void SerializePath(int id, char* buffer, size_t& outSize, size_t& pathCount);
+    void DeserializePath(const char* buffer);
+
     bool CanPlayerMove(const class Vector2& position);
 
     const Vector2& GetRandomEmptyPosition();
@@ -36,7 +39,7 @@ public:
 	void RemovePlayer(int playerId);
 
     std::vector<Vector2*> FindPath(const int playerId, const Vector2& end);
-    void SetClientPlayerPath(std::vector<Vector2*>&& path);
+    void RequestClientPlayerPathChange(std::vector<Vector2*>&& path);
 
     inline std::unordered_map<int, std::vector<Vector2*>> GetAllPlayersPath() { return allPlayersPath; }
     void SetPlayerPath(int id, std::vector<Vector2*>&& path) { allPlayersPath[id] = std::move(path); }
@@ -55,6 +58,9 @@ private:
     std::vector<Vector2*> emptyPositions;
 
     std::vector<Vector2*> clientPlayerPath;
+
+    std::vector<Vector2*> pendingPlayerPath;
+    bool setPathRequested;
 
     std::unordered_map<int, std::vector<Vector2*>> allPlayersPath;
      

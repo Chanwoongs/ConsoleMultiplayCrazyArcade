@@ -367,31 +367,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             path = std::move(gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY)));
         }
 
-        char pathBuffer[packetBufferSize] = {};
-        size_t pathBufferSize = 0;
-
-        for (auto& p : path)
-        {
-            p->Serialize(pathBuffer, pathBufferSize);
-        }
-
-        MovePathPacket* movePathPacket = new MovePathPacket(path.size(), pathBufferSize, pathBuffer);
-
-        size_t serializedSize = 0;
-        char* serializedData = movePathPacket->Serialize(serializedSize);
-
-        EnqueueSend(
-            CreatePacketData(
-                PacketType::MOVE_PATH,
-                serializedSize,
-                serializedData),
-            SendTask::Type::SEND,
-            clientSocket
-        );
-
         gameLevel->SetPlayerPath(mouseInputPacket->playerId, std::move(path));
 
-        delete movePathPacket;
         delete mouseInputPacket;
 
         ReleaseMutex(mutex);
@@ -481,6 +458,32 @@ void GameServer::SynchronizeGameState()
     );
 
     delete gameStatePacket;
+
+    for (auto& kvp : clientIds)
+    {
+        memset(buffer, ' ', packetBufferSize);
+        size_t pathBufferSize = 0;
+        size_t pathCount = 0;
+
+        gameLevel->SerializePath(kvp.first, buffer, pathBufferSize, pathCount);
+
+        if (pathCount == 0) continue;
+        
+        MovePathPacket* movePathPacket = new MovePathPacket(pathCount, pathBufferSize, buffer);
+
+        size_t serializedSize = 0;
+        char* serializedData = movePathPacket->Serialize(serializedSize);
+
+        EnqueueSend(
+            CreatePacketData(
+                PacketType::MOVE_PATH,
+                serializedSize,
+                serializedData),
+            SendTask::Type::SEND,
+            kvp.second
+        );
+
+    }
 
     ReleaseMutex(mutex);
     isSynchronizing = false;

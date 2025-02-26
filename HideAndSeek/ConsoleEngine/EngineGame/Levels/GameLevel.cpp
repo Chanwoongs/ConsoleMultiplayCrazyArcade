@@ -139,6 +139,12 @@ void GameLevel::Draw()
         map->Draw();
     }
 
+    if (setPathRequested && pendingPlayerPath.size() > 0)
+    {
+        clientPlayerPath = std::move(pendingPlayerPath);
+        setPathRequested = false;
+    }
+
     // 경로 그리기
     if (clientPlayerPath.size() > 0)
     {
@@ -249,12 +255,12 @@ std::vector<Vector2*> GameLevel::FindPath(const int playerId, const Vector2& end
     return path;
 }
 
-void GameLevel::SetClientPlayerPath(std::vector<Vector2*>&& path)
+void GameLevel::RequestClientPlayerPathChange(std::vector<Vector2*>&& path)
 {
     WaitForSingleObject(mutex, INFINITE);
 
-    clientPlayerPath.clear();
-    clientPlayerPath = std::move(path);
+    pendingPlayerPath = std::move(path);
+    setPathRequested = true;
 
     ReleaseMutex(mutex);
 }
@@ -446,3 +452,18 @@ void GameLevel::DeserializeGameState(const char* buffer)
 
     ReleaseMutex(mutex);
 }
+
+void GameLevel::SerializePath(int id, char* buffer, size_t& outSize, size_t& pathCount)
+{
+    pathCount = allPlayersPath[id].size();
+
+    for (auto& position : allPlayersPath[id])
+    {
+        position->Serialize(buffer, outSize);
+    }
+}
+
+void GameLevel::DeserializePath(const char* buffer)
+{
+}
+

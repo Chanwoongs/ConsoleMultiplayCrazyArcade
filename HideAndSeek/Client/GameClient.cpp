@@ -222,7 +222,7 @@ void GameClient::ProcessPacket(char* packet, int size)
         }
 
         GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
-        currentLevel->SetClientPlayerPath(std::move(path));
+        currentLevel->RequestClientPlayerPathChange(std::move(path));
 
         delete movePathPacket;
 
