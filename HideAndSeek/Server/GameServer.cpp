@@ -280,11 +280,6 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         WaitForSingleObject(mutex, INFINITE);
 
-        int y = Engine::Get().GetRandomInt(3, 15);
-        int x = Engine::Get().GetRandomInt(10, 60);
-
-        CheckHeapStatus();
-
         PlayerCreateRespondPacket* playerCreateRespondPacket =
             new PlayerCreateRespondPacket(++playerCount);
 
@@ -311,12 +306,12 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         if (!isSeekerSet)
         {
-            gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel, true));
+            gameLevel->AddActor(new Player(playerCount, gameLevel->GetRandomEmptyPosition(), gameLevel, true));
             isSeekerSet = true;
         }
         else
         {
-            gameLevel->AddActor(new Player(playerCount, Vector2(x, y), gameLevel, false));
+            gameLevel->AddActor(new Player(playerCount, gameLevel->GetRandomEmptyPosition(), gameLevel, false));
         }
 
         delete playerCreateRespondPacket;

@@ -24,6 +24,8 @@ public:
 
     bool CanPlayerMove(const class Vector2& position);
 
+    const Vector2& GetRandomEmptyPosition();
+
 	inline void SetClientId(int id) { clientId = id; }
 
     void MovePlayer(int playerId, enum class Direction direction);
@@ -41,6 +43,8 @@ private:
     std::vector<class Player*> players;
 
     std::vector<class Vector2*> wallPositions;
+
+    std::vector<class Vector2*> emptyPositions;
      
     bool isGameClear = false;
 
