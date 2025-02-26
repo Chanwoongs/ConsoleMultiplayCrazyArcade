@@ -3,6 +3,7 @@
 #include "Level/Level.h"
 
 #include <queue>
+#include <unordered_map>
 
 class DrawableActor;
 class Player;
@@ -34,8 +35,11 @@ public:
     void MovePlayer(int playerId, enum class Direction direction);
 	void RemovePlayer(int playerId);
 
-    std::vector<Vector2> FindPath(const int playerId, const Vector2& end);
+    std::vector<Vector2*> FindPath(const int playerId, const Vector2& end);
     void SetClientPlayerPath(std::vector<Vector2*>&& path);
+
+    inline std::unordered_map<int, std::vector<Vector2*>> GetAllPlayersPath() { return allPlayersPath; }
+    void SetPlayerPath(int id, std::vector<Vector2*>&& path) { allPlayersPath[id] = std::move(path); }
     
 private:
     bool CheckGameClear();
@@ -51,6 +55,8 @@ private:
     std::vector<Vector2*> emptyPositions;
 
     std::vector<Vector2*> clientPlayerPath;
+
+    std::unordered_map<int, std::vector<Vector2*>> allPlayersPath;
      
     bool isGameClear = false;
 

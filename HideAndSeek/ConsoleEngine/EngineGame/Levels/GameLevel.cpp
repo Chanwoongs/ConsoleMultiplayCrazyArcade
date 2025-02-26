@@ -238,12 +238,12 @@ void GameLevel::RemovePlayer(int playerId)
 	ReleaseMutex(mutex);
 }
 
-std::vector<Vector2> GameLevel::FindPath(const int playerId, const Vector2& end)
+std::vector<Vector2*> GameLevel::FindPath(const int playerId, const Vector2& end)
 {
-    if (playerId <= 0) return std::vector<Vector2>();
+    if (playerId <= 0) return std::vector<Vector2*>();
 
     WaitForSingleObject(mutex, INFINITE);
-    std::vector<Vector2> path = AStar::FindPath(players[playerId - 1]->Position(), end);
+    std::vector<Vector2*> path = AStar::FindPath(players[playerId - 1]->Position(), end);
     ReleaseMutex(mutex);
 
     return path;

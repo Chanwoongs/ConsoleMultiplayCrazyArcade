@@ -358,7 +358,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         WaitForSingleObject(mutex, INFINITE);
 
-        std::vector<Vector2> path;
+        std::vector<Vector2*> path;
         if (mouseInputPacket->keyCode == VK_LBUTTON)
         {
             path = std::move(gameLevel->FindPath(mouseInputPacket->playerId, Vector2(mouseInputPacket->posX, mouseInputPacket->posY)));
@@ -369,7 +369,7 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         for (auto& p : path)
         {
-            p.Serialize(pathBuffer, pathBufferSize);
+            p->Serialize(pathBuffer, pathBufferSize);
         }
 
         MovePathPacket* movePathPacket = new MovePathPacket(path.size(), pathBufferSize, pathBuffer);
@@ -385,6 +385,8 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
             SendTask::Type::SEND,
             clientSocket
         );
+
+        gameLevel->SetPlayerPath(mouseInputPacket->playerId, std::move(path));
 
         delete movePathPacket;
         delete mouseInputPacket;

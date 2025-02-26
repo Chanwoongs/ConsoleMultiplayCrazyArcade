@@ -25,7 +25,7 @@ public:
 class AStar
 {
 public:
-	static std::vector<Vector2> FindPath(Vector2 startPosition, Vector2 endPosition);
+	static std::vector<Vector2*> FindPath(Vector2 startPosition, Vector2 endPosition);
 
     static void SetMapData(std::vector<std::vector<char>>&& data);
 

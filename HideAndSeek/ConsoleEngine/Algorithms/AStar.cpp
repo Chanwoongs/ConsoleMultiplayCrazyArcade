@@ -14,11 +14,11 @@ void AStar::SetMapData(std::vector<std::vector<char>>&& data)
     mapWidth = (int)mapData[0].size();
 }
 
-std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
+std::vector<Vector2*> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 {
     if (endPosition.x > mapWidth || endPosition.y > mapHeight)
     {
-        return std::vector<Vector2>();
+        return std::vector<Vector2*>();
     }
 
 	std::priority_queue<Node*, std::vector<Node*>, Compare> openList;
@@ -37,12 +37,12 @@ std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 		// 경로를 찾았다
 		if (current->position.x == endPosition.x && current->position.y == endPosition.y)
 		{
-            std::vector<Vector2> path;
+            std::vector<Vector2*> path;
 
 			// 경로를 벡터에 담고
 			while (current->parent)
 			{
-				path.push_back(Vector2(
+				path.push_back(new Vector2(
 					current->position.x,
 					current->position.y));
 				current = current->parent;
@@ -104,5 +104,5 @@ std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
         delete pair.second;
     }
 	
-	return std::vector<Vector2>(); // 경로를 찾을 수 없음
+	return std::vector<Vector2*>(); // 경로를 찾을 수 없음
 }
