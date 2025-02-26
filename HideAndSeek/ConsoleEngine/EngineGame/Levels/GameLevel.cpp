@@ -152,7 +152,7 @@ void GameLevel::Draw()
         map->Draw();
     }
 
-    if (setPathRequested && pendingPlayerPath.size() > 0)
+    if (setPathRequested)
     {
         clientPlayerPath = std::move(pendingPlayerPath);
         setPathRequested = false;

@@ -468,8 +468,6 @@ void GameServer::SynchronizeGameState()
         size_t pathCount = 0;
 
         gameLevel->SerializePath(kvp.first, buffer, pathBufferSize, pathCount);
-
-        if (pathCount == 0) continue;
         
         MovePathPacket* movePathPacket = new MovePathPacket(pathCount, pathBufferSize, buffer);
 
@@ -484,7 +482,6 @@ void GameServer::SynchronizeGameState()
             SendTask::Type::SEND,
             kvp.second
         );
-
     }
 
     ReleaseMutex(mutex);
