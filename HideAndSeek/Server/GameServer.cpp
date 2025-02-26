@@ -439,6 +439,8 @@ void GameServer::SynchronizeGameState()
 
     WaitForSingleObject(mutex, INFINITE);
 
+    gameLevel->Update(1);
+
     char buffer[packetBufferSize] = {};
     size_t gameStateSize = 0;
 

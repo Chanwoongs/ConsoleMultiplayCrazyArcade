@@ -124,9 +124,20 @@ void GameLevel::Update(float deltaTime)
 
     if (players.size() > 0)
     {
-        for (auto& player : players)
+        for (int i = 0; i < players.size(); i++)
         {
-            player->Update(deltaTime);
+            players[i]->Update(deltaTime);
+
+            int playerId = players[i]->Id();
+            if (allPlayersPath.find(playerId) != allPlayersPath.end())
+            {
+                std::vector<Vector2*>& path = allPlayersPath[playerId];
+                if (!path.empty())
+                {
+                    players[i]->SetPosition(*path[0]);
+                    path.erase(path.begin());
+                }
+            }
         }
     }
 }
@@ -462,8 +473,3 @@ void GameLevel::SerializePath(int id, char* buffer, size_t& outSize, size_t& pat
         position->Serialize(buffer, outSize);
     }
 }
-
-void GameLevel::DeserializePath(const char* buffer)
-{
-}
-

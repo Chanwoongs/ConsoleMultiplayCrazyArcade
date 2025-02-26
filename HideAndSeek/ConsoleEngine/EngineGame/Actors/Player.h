@@ -18,6 +18,8 @@ public:
     virtual void Draw() override;
     void Initialize(const int clientId);
 
+    inline int Id() { return id; }
+
 private:
     // 게임 레벨을 참조하는 변수
     GameLevel* refLevel = nullptr;
