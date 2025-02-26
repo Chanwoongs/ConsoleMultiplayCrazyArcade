@@ -9,6 +9,7 @@
 #include <WS2tcpip.h>
 #include <vector>
 #include <queue>
+#include <unordered_map>
 
 #include "Network/Packets.h"
 
@@ -66,6 +67,7 @@ private:
 private:
 	SOCKET hServerSocket = 0;
 	std::vector<SOCKET> clientSockets;
+    std::unordered_map<int, SOCKET> clientIds;
 
 	SOCKADDR_IN* serverAddress;
 

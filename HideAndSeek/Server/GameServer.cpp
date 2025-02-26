@@ -280,8 +280,9 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         WaitForSingleObject(mutex, INFINITE);
 
+        int clientId = ++playerCount;
         PlayerCreateRespondPacket* playerCreateRespondPacket =
-            new PlayerCreateRespondPacket(++playerCount);
+            new PlayerCreateRespondPacket(clientId);
 
         CheckHeapStatus();
 
@@ -306,12 +307,14 @@ void GameServer::ProcessPacket(SOCKET clientSocket, char* packet)
 
         if (!isSeekerSet)
         {
-            gameLevel->AddActor(new Player(playerCount, gameLevel->GetRandomEmptyPosition(), gameLevel, true));
+            clientIds.insert(std::make_pair(clientId, clientSocket));
+            gameLevel->AddActor(new Player(clientId, gameLevel->GetRandomEmptyPosition(), gameLevel, true));
             isSeekerSet = true;
         }
         else
         {
-            gameLevel->AddActor(new Player(playerCount, gameLevel->GetRandomEmptyPosition(), gameLevel, false));
+            clientIds.insert(std::make_pair(clientId, clientSocket));
+            gameLevel->AddActor(new Player(clientId, gameLevel->GetRandomEmptyPosition(), gameLevel, false));
         }
 
         delete playerCreateRespondPacket;
