@@ -138,6 +138,20 @@ void GameLevel::Draw()
     {
         map->Draw();
     }
+
+    // 경로 그리기
+    if (clientPlayerPath.size() > 0)
+    {
+        for (auto& position : clientPlayerPath)
+        {
+            if (position == nullptr)
+            {
+                continue; 
+            }
+                
+            Engine::Get().Draw(*position, ".", Color::Green);
+        }
+    }
     
     // 플레이어 그리기
     if (players.size() > 0)

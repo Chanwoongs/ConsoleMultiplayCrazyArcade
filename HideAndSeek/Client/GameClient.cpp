@@ -212,14 +212,17 @@ void GameClient::ProcessPacket(char* packet, int size)
         MovePathPacket* movePathPacket = new MovePathPacket(0, 0, nullptr);
         movePathPacket->Deserialize(packet, size);
 
-        std::vector<Vector2> path;
+        std::vector<Vector2*> path;
         size_t offset = 0;
         while (offset < movePathPacket->pathBufferSize)
         {
-            Vector2 position(0, 0);
-            position.Deserialize(movePathPacket->pathBuffer, offset);
+            Vector2* position = new Vector2(0, 0);
+            position->Deserialize(movePathPacket->pathBuffer, offset);
             path.push_back(position);
         }
+
+        GameLevel* currentLevel = static_cast<GameLevel*>(Game::Get().GetCurrentLevel());
+        currentLevel->SetClientPlayerPath(std::move(path));
 
         delete movePathPacket;
 

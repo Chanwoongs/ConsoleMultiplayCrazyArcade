@@ -5,6 +5,9 @@
 #include <queue>
 
 class DrawableActor;
+class Player;
+class Vector2;
+
 class ENGINE_API GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)
@@ -32,6 +35,10 @@ public:
 	void RemovePlayer(int playerId);
 
     std::vector<Vector2> FindPath(const int playerId, const Vector2& end);
+    inline void SetClientPlayerPath(std::vector<Vector2*>&& path)
+    {
+        clientPlayerPath = std::move(path);
+    }
     
 private:
     bool CheckGameClear();
@@ -40,11 +47,13 @@ private:
 
     DrawableActor* map = nullptr;
 
-    std::vector<class Player*> players;
+    std::vector<Player*> players;
 
-    std::vector<class Vector2*> wallPositions;
+    std::vector<Vector2*> wallPositions;
 
-    std::vector<class Vector2*> emptyPositions;
+    std::vector<Vector2*> emptyPositions;
+
+    std::vector<Vector2*> clientPlayerPath;
      
     bool isGameClear = false;
 
@@ -52,7 +61,7 @@ private:
 
     DrawableActor* tempMap = nullptr;
 
-    std::vector<class Player*> tempPlayers;
+    std::vector<Player*> tempPlayers;
 
     bool isThreadWriting = false;
 
