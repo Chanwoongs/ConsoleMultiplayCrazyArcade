@@ -34,8 +34,6 @@ Game::~Game()
 
 void Game::ToggleMenu()
 {
-    system("cls");
-
     showMenu = !showMenu;
     if (showMenu)
     {
@@ -64,8 +62,6 @@ void Game::RequestEnterGame()
 
 void Game::EnterGame()
 {
-    system("cls");
-
     GameClient::Get().EnterGame();
 }
 

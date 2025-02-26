@@ -16,6 +16,11 @@ void AStar::SetMapData(std::vector<std::vector<char>>&& data)
 
 std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 {
+    if (endPosition.x > mapWidth || endPosition.y > mapHeight)
+    {
+        return std::vector<Vector2>();
+    }
+
 	std::priority_queue<Node*, std::vector<Node*>, Compare> openList;
     std::unordered_map<int, Node*> allNodes;
 
@@ -70,7 +75,7 @@ std::vector<Vector2> AStar::FindPath(Vector2 startPosition, Vector2 endPosition)
 				if (newPosition.x < 0 || newPosition.y < 0 ||
 					newPosition.x >= mapWidth || newPosition.y >= mapHeight) continue;
 				// 갈 수 없는 곳 체크
-				if (mapData[(int)newPosition.y][(int)newPosition.x] == 1) continue;
+				if (mapData[newPosition.y][newPosition.x] == '1') continue;
 
 				Node* newNode = new Node(newPosition);
 

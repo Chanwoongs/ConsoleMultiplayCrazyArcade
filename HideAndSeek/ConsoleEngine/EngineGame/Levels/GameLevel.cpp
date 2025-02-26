@@ -16,8 +16,6 @@
 
 GameLevel::GameLevel()
 {
-    system("cls");
-    
     mutex = CreateMutex(NULL, FALSE, NULL);
 
     // 커서 감추기

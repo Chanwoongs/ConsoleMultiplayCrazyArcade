@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 
     client->RunThreads();
 
-    system("cls");
     game->Run();
 
     delete game;
