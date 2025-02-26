@@ -38,6 +38,8 @@ public:
     void MovePlayer(int playerId, enum class Direction direction);
 	void RemovePlayer(int playerId);
 
+    void ProcessCollision();
+
     std::vector<Vector2*> FindPath(const int playerId, const Vector2& end);
     void RequestClientPlayerPathChange(std::vector<Vector2*>&& path);
 

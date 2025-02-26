@@ -18,7 +18,9 @@ public:
     virtual void Draw() override;
     void Initialize(const int clientId);
 
-    inline int Id() { return id; }
+    inline int Id() const { return id; }
+    inline bool IsSeeker() const { return isSeeker; }
+    inline void SetToSeeker() { isSeeker = true; }
 
 private:
     // 게임 레벨을 참조하는 변수

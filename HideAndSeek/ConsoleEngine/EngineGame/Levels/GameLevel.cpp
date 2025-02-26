@@ -139,6 +139,8 @@ void GameLevel::Update(float deltaTime)
                 }
             }
         }
+
+        ProcessCollision();
     }
 }
 
@@ -253,6 +255,28 @@ void GameLevel::RemovePlayer(int playerId)
 	WaitForSingleObject(mutex, INFINITE);
 	players.erase(players.begin() + playerId - 1);
 	ReleaseMutex(mutex);
+}
+
+void GameLevel::ProcessCollision()
+{
+    for (int i = 0; i < players.size(); i++)
+    {
+        Player*& seeker = players[i];
+
+        if (!seeker->IsSeeker()) continue;
+
+        for (int j = 0; j < players.size(); j++)
+        {
+            Player*& hider = players[j];
+
+            if (hider->IsSeeker()) continue;
+
+            if (seeker->Position() == hider->Position())
+            {
+                hider->SetToSeeker();
+            }
+        }
+    }
 }
 
 std::vector<Vector2*> GameLevel::FindPath(const int playerId, const Vector2& end)
