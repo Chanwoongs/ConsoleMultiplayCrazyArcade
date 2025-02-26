@@ -61,5 +61,5 @@ private:
     bool isGameover = false;
     bool hasEnteredGame = false;
 
-    static constexpr int packetBufferSize = 8192;
+    static constexpr int packetBufferSize = 4096;
 };

@@ -221,7 +221,7 @@ unsigned WINAPI GameServer::Send(void* arg)
         else 
         {
             ReleaseMutex(server->sendMutex);
-            Sleep(10);
+            Sleep(1);
         }
     }
 

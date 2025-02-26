@@ -91,5 +91,5 @@ private:
 
     class GameLevel* gameLevel = nullptr;
 
-    static constexpr int packetBufferSize = 8192;
+    static constexpr int packetBufferSize = 4096;
 };

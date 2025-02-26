@@ -36,8 +36,8 @@ Engine::Engine()
     // 랜덤 시드 설정
     srand((unsigned int)time(nullptr));
 
-	// 싱글톤 객체 설정
-	Instance = this;
+    // 싱글톤 객체 설정
+    Instance = this;
 
     // 기본 타겟 프레임 속도 설정
     SetTargetFrameRate(60.0f);
@@ -58,14 +58,6 @@ Engine::Engine()
 
     // 스왑 버퍼.
     Present();
-
-    // 마우스/윈도우 이벤트 활성화.
-    HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
-    int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
-    SetConsoleMode(inputHandle, flag);
-
-    // std::cin/std::cout 연결 끊기.
-    std::ios::sync_with_stdio(false);
 }
 
 Engine::~Engine()
@@ -132,11 +124,6 @@ void Engine::Run()
             mainLevel = pendingLevel;
             pendingLevel = nullptr;
             levelChangeRequested = false;
-
-            // 마우스/윈도우 이벤트 재활성화
-            static HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
-            static int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
-            SetConsoleMode(inputHandle, flag);
         }
 
 		// 프레임 확인
@@ -271,10 +258,16 @@ Engine& Engine::Get()
 void Engine::ProcessInput()
 {
     static HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
+    static int flag = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
+    if (!SetConsoleMode(inputHandle, flag))
+    {
+        std::cerr << "Failed to set console mode" << std::endl;
+        return;
+    }
 
     INPUT_RECORD record;
     DWORD events;
-    if (PeekConsoleInput(inputHandle, &record, 1, &events) && events > 0)
+    while (PeekConsoleInput(inputHandle, &record, 1, &events) && events > 0)
     {
         if (ReadConsoleInput(inputHandle, &record, 1, &events))
         {
