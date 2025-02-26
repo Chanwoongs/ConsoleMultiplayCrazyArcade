@@ -61,8 +61,6 @@ void GameLevel::AddActor(Actor* newActor)
 
 void GameLevel::Update(float deltaTime)
 {
-    if (clientId == 0) return;
-
     Super::Update(deltaTime);
 
     // 게임이 클리어됐으면, 게임 종료 처리
@@ -111,14 +109,6 @@ void GameLevel::Update(float deltaTime)
         ReleaseMutex(mutex); 
     }
 
-    if (players.size() > 0)
-    {
-        for (auto& player : players)
-        {
-            player->Update(deltaTime);
-        }
-    }
-
     if (!isThreadWriting)
     {
         if (tempMap != nullptr)
@@ -128,7 +118,17 @@ void GameLevel::Update(float deltaTime)
             map = tempMap;
             tempMap = nullptr;
         }
-    }   
+    }
+
+    if (clientId != 99999999) return;
+
+    if (players.size() > 0)
+    {
+        for (auto& player : players)
+        {
+            player->Update(deltaTime);
+        }
+    }
 }
 
 void GameLevel::Draw()
